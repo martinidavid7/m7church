@@ -14,6 +14,7 @@ return new class extends Migration
         Schema::create('visitors', function (Blueprint $table) {
             $table->id();
             $table->string('name');
+            $table->date('visit_date');
             $table->date('birth_date')->nullable();
             $table->enum('gender', ['M', 'F'])->nullable();
             $table->string('marital_status')->nullable();
