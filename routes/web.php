@@ -54,8 +54,17 @@ Route::middleware(['auth'])->group(function () {
 
 });
 
-Route::resource('visitors', VisitorController::class)->middleware(['auth']);
-Route::resource('cities', CityController::class)->middleware(['auth']);
+Route::middleware(['auth'])->group(function () {
+    // Rotas personalizadas de visitantes (antes do resource para terem prioridade)
+    Route::get('visitors/export', [VisitorController::class, 'export'])->name('visitors.export');
+    Route::get('visitors/print-blank-form', [VisitorController::class, 'printBlankForm'])->name('visitors.print-blank-form');
+
+    // Rotas CRUD padrão de visitantes
+    Route::resource('visitors', VisitorController::class);
+
+    // Rotas CRUD padrão de cidades
+    Route::resource('cities', CityController::class);
+});
 
 
 require __DIR__ . '/auth.php';
