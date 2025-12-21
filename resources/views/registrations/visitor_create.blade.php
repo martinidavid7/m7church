@@ -1,10 +1,12 @@
 <x-layouts.app :title="__('messages.Registration')">
     <div class="p-6">
-        <h1 class="text-2xl font-semibold text-gray-900 dark:text-white mb-6">{{ __('messages.Registration') }}
-            {{ __('messages.Members') }}</h1>
+        <h1 class="text-2xl font-semibold text-gray-900 dark:text-white mb-6">{{ __('messages.Registration') }} - {{ __('messages.Visitors') }}</h1>
 
         <form action="store" method="POST" enctype="multipart/form-data" x-data class="space-y-6">
             @csrf {{-- Token CSRF para segurança --}}
+
+            {{-- Campo oculto para user_id (preenchido pelo controller) --}}
+            <input type="hidden" name="user_id" value="{{ auth()->id() }}">
 
             {{-- Informações Pessoais --}}
             <div class="border-b border-gray-200 dark:border-gray-700 pb-4">
@@ -24,6 +26,18 @@
                     @enderror
                 </div>
 
+                <div class="sm:col-span-1">
+                    <label for="visit_date"
+                        class="block text-sm font-medium text-gray-700 dark:text-gray-300">Data da Visita *</label>
+                    <input type="date" name="visit_date" id="visit_date"
+                        value="{{ old('visit_date', date('Y-m-d')) }}"
+                        class="mt-1 block w-full rounded-md border-gray-300 shadow-sm focus:border-indigo-500 focus:ring-indigo-500 dark:bg-gray-700 dark:border-gray-600 dark:text-white sm:text-sm py-2"
+                        required>
+                    @error('visit_date')
+                        <span class="text-red-500 text-sm">{{ $message }}</span>
+                    @enderror
+                </div>
+
                 <div class="sm:col-span-2">
                     <label for="birth_date"
                         class="block text-sm font-medium text-gray-700 dark:text-gray-300">Data de Nascimento</label>
@@ -34,22 +48,10 @@
                         <span class="text-red-500 text-sm">{{ $message }}</span>
                     @enderror
                 </div>
-
-                <div class="sm:col-span-1">
-                    <label for="active"
-                        class="block text-sm font-medium text-gray-700 dark:text-gray-300">{{ __('messages.Status') }}</label>
-                    <select id="active" name="active"
-                        class="mt-1 block w-full rounded-md border-gray-300 shadow-sm focus:border-indigo-500 focus:ring-indigo-500 dark:bg-gray-700 dark:border-gray-600 dark:text-white sm:text-sm py-2">
-                        <option value="0" {{ old('active') == '0' ? 'selected' : '' }}>
-                            {{ __('messages.Inactive') }}</option>
-                        <option value="1" {{ old('active', '1') == '1' ? 'selected' : '' }}>
-                            {{ __('messages.Active') }}</option>
-                    </select>
-                </div>
             </div>
 
             <div class="grid grid-cols-1 gap-x-6 gap-y-6 sm:grid-cols-6">
-                <div class="sm:col-span-2">
+                <div class="sm:col-span-3">
                     <label for="gender"
                         class="block text-sm font-medium text-gray-700 dark:text-gray-300">Sexo</label>
                     <select id="gender" name="gender"
@@ -63,7 +65,7 @@
                     @enderror
                 </div>
 
-                <div class="sm:col-span-2">
+                <div class="sm:col-span-3">
                     <label for="marital_status"
                         class="block text-sm font-medium text-gray-700 dark:text-gray-300">Estado Civil</label>
                     <select id="marital_status" name="marital_status"
@@ -74,16 +76,6 @@
                         <option value="Divorciado(a)" {{ old('marital_status') == 'Divorciado(a)' ? 'selected' : '' }}>Divorciado(a)</option>
                         <option value="Viúvo(a)" {{ old('marital_status') == 'Viúvo(a)' ? 'selected' : '' }}>Viúvo(a)</option>
                     </select>
-                </div>
-
-                <div class="sm:col-span-2">
-                    <label for="photo"
-                        class="block text-sm font-medium text-gray-700 dark:text-gray-300">Foto</label>
-                    <input type="file" name="photo" id="photo" accept="image/*"
-                        class="mt-1 block w-full text-sm text-gray-900 dark:text-gray-300 file:mr-4 file:py-2 file:px-4 file:rounded-md file:border-0 file:text-sm file:font-semibold file:bg-indigo-50 file:text-indigo-700 hover:file:bg-indigo-100">
-                    @error('photo')
-                        <span class="text-red-500 text-sm">{{ $message }}</span>
-                    @enderror
                 </div>
             </div>
 
@@ -153,7 +145,7 @@
                 </div>
             </div>
             <div class="grid grid-cols-1 gap-x-6 gap-y-6 sm:grid-cols-6">
-                <div class="sm:col-span-2">
+                <div class="sm:col-span-3">
                     <label for="zip_code"
                         class="block text-sm font-medium text-gray-700 dark:text-gray-300">{{ __('messages.Zip Code') }}</label>
                     <input type="text" name="zip_code" id="zip_code" value="{{ old('zip_code') }}"
@@ -161,35 +153,17 @@
                         class="mt-1 block w-full rounded-md border-gray-300 shadow-sm focus:border-indigo-500 focus:ring-indigo-500 dark:bg-gray-700 dark:border-gray-600 dark:text-white sm:text-sm py-2">
                 </div>
 
-                <div class="sm:col-span-1">
-                    <label for="uf_id"
-                        class="block text-sm font-medium text-gray-700 dark:text-gray-300">{{ __('messages.State') }}</label>
-                    <select name="uf_id" id="uf_id"
-                        class="mt-1 block w-full rounded-md border-gray-300 shadow-sm focus:border-indigo-500 focus:ring-indigo-500 dark:bg-gray-700 dark:border-gray-600 dark:text-white sm:text-sm py-2">
-                        <option value="">Selecione a UF</option>
-                        @foreach ($uf as $state)
-                            <option value="{{ $state->id }}"
-                                {{ old('uf_id') == $state->id ? 'selected' : '' }}>
-                                {{ $state->uf }}</option>
-                        @endforeach
-                    </select>
-                </div>
                 <div class="sm:col-span-3">
-                    <label for="city"
+                    <label for="city_id"
                         class="block text-sm font-medium text-gray-700 dark:text-gray-300">{{ __('messages.City') }}</label>
-
-                        <select name="city_id" class="mt-1 block w-full rounded-md border-gray-300 shadow-sm focus:border-indigo-500 focus:ring-indigo-500 dark:bg-gray-700 dark:border-gray-600 dark:text-white sm:text-sm py-2">
+                    <select name="city_id" id="city_id" class="mt-1 block w-full rounded-md border-gray-300 shadow-sm focus:border-indigo-500 focus:ring-indigo-500 dark:bg-gray-700 dark:border-gray-600 dark:text-white sm:text-sm py-2">
                         <option value="">Selecione a Cidade</option>
-
                         @foreach ($cities as $city)
                             <option value="{{ $city->id }}"
-                                {{ ($city->id ?? old('city')) == $city->id ? 'selected' : '' }}>
+                                {{ old('city_id') == $city->id ? 'selected' : '' }}>
                                 {{ $city->name }}</option>
                         @endforeach
-
                     </select>
-                    <!-- <input type="text" name="city" id="city" value="{{ old('city') }}" autocomplete="city"
-                        class="mt-1 block w-full rounded-md border-gray-300 shadow-sm focus:border-indigo-500 focus:ring-indigo-500 dark:bg-gray-700 dark:border-gray-600 dark:text-white sm:text-sm py-2"> -->
                 </div>
             </div>
             {{-- Contato --}}
@@ -221,66 +195,35 @@
                 </div>
                 <div class="sm:col-span-2">
                     <label for="mail"
-                        class="block text-sm font-medium text-gray-700 dark:text-gray-300">{{ __('messages.Email') }} *</label>
+                        class="block text-sm font-medium text-gray-700 dark:text-gray-300">{{ __('messages.Email') }}</label>
                     <input type="email" name="mail" id="mail" value="{{ old('mail') }}"
                         autocomplete="email"
-                        class="mt-1 block w-full rounded-md border-gray-300 shadow-sm focus:border-indigo-500 focus:ring-indigo-500 dark:bg-gray-700 dark:border-gray-600 dark:text-white sm:text-sm py-2"
-                        required>
+                        class="mt-1 block w-full rounded-md border-gray-300 shadow-sm focus:border-indigo-500 focus:ring-indigo-500 dark:bg-gray-700 dark:border-gray-600 dark:text-white sm:text-sm py-2">
                     @error('mail')
                         <span class="text-red-500 text-sm">{{ $message }}</span>
                     @enderror
                 </div>
+
+                <div class="sm:col-span-6">
+                    <div class="flex items-center">
+                        <input id="accept_receive_messages" name="accept_receive_messages" type="checkbox" value="1" {{ old('accept_receive_messages') ? 'checked' : '' }}
+                            class="h-4 w-4 rounded border-gray-300 text-indigo-600 focus:ring-indigo-500 dark:border-gray-600 dark:bg-gray-700 dark:ring-offset-gray-800">
+                        <label for="accept_receive_messages" class="ml-2 block text-sm text-gray-900 dark:text-gray-300">Aceita receber mensagens</label>
+                    </div>
+                </div>
             </div>
 
-            {{-- Informações Eclesiásticas --}}
+            {{-- Observações --}}
             <div class="border-b border-gray-200 dark:border-gray-700 pb-4 pt-6">
-                <h2 class="text-lg font-semibold text-gray-900 dark:text-white">Informações Eclesiásticas</h2>
+                <h2 class="text-lg font-semibold text-gray-900 dark:text-white">Observações</h2>
             </div>
 
             <div class="grid grid-cols-1 gap-x-6 gap-y-6 sm:grid-cols-6">
-                <div class="sm:col-span-2">
-                    <label for="baptism_date"
-                        class="block text-sm font-medium text-gray-700 dark:text-gray-300">Data de Batismo</label>
-                    <input type="date" name="baptism_date" id="baptism_date" value="{{ old('baptism_date') }}"
-                        class="mt-1 block w-full rounded-md border-gray-300 shadow-sm focus:border-indigo-500 focus:ring-indigo-500 dark:bg-gray-700 dark:border-gray-600 dark:text-white sm:text-sm py-2">
-                    @error('baptism_date')
-                        <span class="text-red-500 text-sm">{{ $message }}</span>
-                    @enderror
-                </div>
-
-                <div class="sm:col-span-2">
-                    <label for="membership_date"
-                        class="block text-sm font-medium text-gray-700 dark:text-gray-300">Data de Membresia</label>
-                    <input type="date" name="membership_date" id="membership_date" value="{{ old('membership_date') }}"
-                        class="mt-1 block w-full rounded-md border-gray-300 shadow-sm focus:border-indigo-500 focus:ring-indigo-500 dark:bg-gray-700 dark:border-gray-600 dark:text-white sm:text-sm py-2">
-                </div>
-
                 <div class="sm:col-span-6">
                     <label for="observations"
                         class="block text-sm font-medium text-gray-700 dark:text-gray-300">Observações</label>
                     <textarea name="observations" id="observations" rows="3"
                         class="mt-1 block w-full rounded-md border-gray-300 shadow-sm focus:border-indigo-500 focus:ring-indigo-500 dark:bg-gray-700 dark:border-gray-600 dark:text-white sm:text-sm py-2">{{ old('observations') }}</textarea>
-                </div>
-            </div>
-
-            {{-- Acesso ao Sistema --}}
-            <div class="border-b border-gray-200 dark:border-gray-700 pb-4 pt-6">
-                <h2 class="text-lg font-semibold text-gray-900 dark:text-white">Acesso ao Sistema</h2>
-            </div>
-            <div class="grid grid-cols-1 gap-x-6 gap-y-6 sm:grid-cols-6">
-                <div class="sm:col-span-3">
-                    <label for="password"
-                        class="block text-sm font-medium text-gray-700 dark:text-gray-300">{{ __('messages.Password') }}</label>
-                    <input type="password" name="password" id="password" autocomplete="Password"
-                        class="mt-1 block w-full rounded-md border-gray-300 shadow-sm focus:border-indigo-500 focus:ring-indigo-500 dark:bg-gray-700 dark:border-gray-600 dark:text-white sm:text-sm py-2"
-                        required>
-                </div>
-                <div class="sm:col-span-3">
-                    <label for="password"
-                        class="block text-sm font-medium text-gray-700 dark:text-gray-300">{{ __('messages.Confirm Password') }}</label>
-                    <input type="password" name="confirm_password" id="confirm_password" autocomplete="password"
-                        class="mt-1 block w-full rounded-md border-gray-300 shadow-sm focus:border-indigo-500 focus:ring-indigo-500 dark:bg-gray-700 dark:border-gray-600 dark:text-white sm:text-sm py-2"
-                        required>
                 </div>
             </div>
 
@@ -293,34 +236,4 @@
         </form>
     </div>
 
-    <script>
-        document.addEventListener('DOMContentLoaded', function() {
-            const ufSelect = document.getElementById('uf_id');
-            const citySelect = document.querySelector('select[name="city_id"]');
-
-            ufSelect.addEventListener('change', function() {
-                const ufId = this.value;
-
-                // Limpar o select de cidades
-                citySelect.innerHTML = '<option value="">Selecione a Cidade</option>';
-
-                if (ufId) {
-                    // Fazer requisição para buscar as cidades da UF selecionada
-                    fetch(`/person/cities-by-uf/${ufId}`)
-                        .then(response => response.json())
-                        .then(cities => {
-                            cities.forEach(city => {
-                                const option = document.createElement('option');
-                                option.value = city.id;
-                                option.textContent = city.name;
-                                citySelect.appendChild(option);
-                            });
-                        })
-                        .catch(error => {
-                            console.error('Erro ao carregar cidades:', error);
-                        });
-                }
-            });
-        });
-    </script>
 </x-layouts.app>
