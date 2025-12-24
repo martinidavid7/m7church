@@ -64,4 +64,8 @@ return [
     "Add New Visitor" => "Adicionar Novo Visitante",
     "Yes" => "Sim",
     "No" => "Não",
+    "Church Type" => 'Tipo de Igreja',
+    "Parent Church" => 'Igreja Pai',
+    "Pastor" => 'Pastor',
+    "Logo" => 'Logo',
 ];
