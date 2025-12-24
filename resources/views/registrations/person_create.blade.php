@@ -89,6 +89,9 @@
                         <option value="Divorciado(a)" {{ old('marital_status') == 'Divorciado(a)' ? 'selected' : '' }}>Divorciado(a)</option>
                         <option value="Viúvo(a)" {{ old('marital_status') == 'Viúvo(a)' ? 'selected' : '' }}>Viúvo(a)</option>
                     </select>
+                    @error('marital_status')
+                        <span class="text-red-500 text-sm">{{ $message }}</span>
+                    @enderror
                 </div>
 
                 <div class="sm:col-span-2">
@@ -108,6 +111,9 @@
                         class="block text-sm font-medium text-gray-700 dark:text-gray-300">Profissão</label>
                     <input type="text" name="profession" id="profession" value="{{ old('profession') }}"
                         class="mt-1 block w-full rounded-md border-gray-300 shadow-sm focus:border-indigo-500 focus:ring-indigo-500 dark:bg-gray-700 dark:border-gray-600 dark:text-white sm:text-sm py-2">
+                    @error('profession')
+                        <span class="text-red-500 text-sm">{{ $message }}</span>
+                    @enderror
                 </div>
 
                 <div class="sm:col-span-3">
@@ -124,6 +130,9 @@
                         <option value="Superior Completo" {{ old('education_level') == 'Superior Completo' ? 'selected' : '' }}>Superior Completo</option>
                         <option value="Pós-graduação" {{ old('education_level') == 'Pós-graduação' ? 'selected' : '' }}>Pós-graduação</option>
                     </select>
+                    @error('education_level')
+                        <span class="text-red-500 text-sm">{{ $message }}</span>
+                    @enderror
                 </div>
             </div>
 
@@ -140,6 +149,9 @@
                     <input type="text" name="address" id="address" value="{{ old('address') }}"
                         autocomplete="Address"
                         class="mt-1 block w-full rounded-md border-gray-300 shadow-sm focus:border-indigo-500 focus:ring-indigo-500 dark:bg-gray-700 dark:border-gray-600 dark:text-white sm:text-sm py-2">
+                    @error('address')
+                        <span class="text-red-500 text-sm">{{ $message }}</span>
+                    @enderror
                 </div>
 
                 <div class="sm:col-span-2">
@@ -148,6 +160,9 @@
                     <input type="text" name="number" id="number" value="{{ old('number') }}"
                         autocomplete="Number"
                         class="mt-1 block w-full rounded-md border-gray-300 shadow-sm focus:border-indigo-500 focus:ring-indigo-500 dark:bg-gray-700 dark:border-gray-600 dark:text-white sm:text-sm py-2">
+                    @error('number')
+                        <span class="text-red-500 text-sm">{{ $message }}</span>
+                    @enderror
                 </div>
             </div>
             <div class="grid grid-cols-1 gap-x-6 gap-y-6 sm:grid-cols-6">
@@ -157,6 +172,9 @@
                     <input type="text" name="neighborhood" id="neighborhood" value="{{ old('neighborhood') }}"
                         autocomplete="neighborhood"
                         class="mt-1 block w-full rounded-md border-gray-300 shadow-sm focus:border-indigo-500 focus:ring-indigo-500 dark:bg-gray-700 dark:border-gray-600 dark:text-white sm:text-sm py-2">
+                    @error('neighborhood')
+                        <span class="text-red-500 text-sm">{{ $message }}</span>
+                    @enderror
                 </div>
 
                 <div class="sm:col-span-3">
@@ -165,6 +183,9 @@
                     <input type="text" name="complement" id="complement" value="{{ old('complement') }}"
                         autocomplete="complement"
                         class="mt-1 block w-full rounded-md border-gray-300 shadow-sm focus:border-indigo-500 focus:ring-indigo-500 dark:bg-gray-700 dark:border-gray-600 dark:text-white sm:text-sm py-2">
+                    @error('complement')
+                        <span class="text-red-500 text-sm">{{ $message }}</span>
+                    @enderror
                 </div>
             </div>
             <div class="grid grid-cols-1 gap-x-6 gap-y-6 sm:grid-cols-6">
@@ -174,6 +195,9 @@
                     <input type="text" name="zip_code" id="zip_code" value="{{ old('zip_code') }}"
                         autocomplete="zip_code" x-mask="99999-999"
                         class="mt-1 block w-full rounded-md border-gray-300 shadow-sm focus:border-indigo-500 focus:ring-indigo-500 dark:bg-gray-700 dark:border-gray-600 dark:text-white sm:text-sm py-2">
+                    @error('zip_code')
+                        <span class="text-red-500 text-sm">{{ $message }}</span>
+                    @enderror
                 </div>
 
                 <div class="sm:col-span-1">
@@ -188,23 +212,24 @@
                                 {{ $state->uf }}</option>
                         @endforeach
                     </select>
+                    @error('uf_id')
+                        <span class="text-red-500 text-sm">{{ $message }}</span>
+                    @enderror
                 </div>
                 <div class="sm:col-span-3">
-                    <label for="city"
+                    <label for="city_id"
                         class="block text-sm font-medium text-gray-700 dark:text-gray-300">{{ __('messages.City') }}</label>
-
-                        <select name="city_id" class="mt-1 block w-full rounded-md border-gray-300 shadow-sm focus:border-indigo-500 focus:ring-indigo-500 dark:bg-gray-700 dark:border-gray-600 dark:text-white sm:text-sm py-2">
+                    <select name="city_id" id="city_id" class="mt-1 block w-full rounded-md border-gray-300 shadow-sm focus:border-indigo-500 focus:ring-indigo-500 dark:bg-gray-700 dark:border-gray-600 dark:text-white sm:text-sm py-2">
                         <option value="">Selecione a Cidade</option>
-
                         @foreach ($cities as $city)
                             <option value="{{ $city->id }}"
-                                {{ ($city->id ?? old('city')) == $city->id ? 'selected' : '' }}>
+                                {{ old('city_id') == $city->id ? 'selected' : '' }}>
                                 {{ $city->name }}</option>
                         @endforeach
-
                     </select>
-                    <!-- <input type="text" name="city" id="city" value="{{ old('city') }}" autocomplete="city"
-                        class="mt-1 block w-full rounded-md border-gray-300 shadow-sm focus:border-indigo-500 focus:ring-indigo-500 dark:bg-gray-700 dark:border-gray-600 dark:text-white sm:text-sm py-2"> -->
+                    @error('city_id')
+                        <span class="text-red-500 text-sm">{{ $message }}</span>
+                    @enderror
                 </div>
             </div>
             {{-- Contato --}}
@@ -285,6 +310,9 @@
                         class="block text-sm font-medium text-gray-700 dark:text-gray-300">Data de Membresia</label>
                     <input type="date" name="membership_date" id="membership_date" value="{{ old('membership_date') }}"
                         class="mt-1 block w-full rounded-md border-gray-300 shadow-sm focus:border-indigo-500 focus:ring-indigo-500 dark:bg-gray-700 dark:border-gray-600 dark:text-white sm:text-sm py-2">
+                    @error('membership_date')
+                        <span class="text-red-500 text-sm">{{ $message }}</span>
+                    @enderror
                 </div>
 
                 <div class="sm:col-span-6">
@@ -292,6 +320,9 @@
                         class="block text-sm font-medium text-gray-700 dark:text-gray-300">Observações</label>
                     <textarea name="observations" id="observations" rows="3"
                         class="mt-1 block w-full rounded-md border-gray-300 shadow-sm focus:border-indigo-500 focus:ring-indigo-500 dark:bg-gray-700 dark:border-gray-600 dark:text-white sm:text-sm py-2">{{ old('observations') }}</textarea>
+                    @error('observations')
+                        <span class="text-red-500 text-sm">{{ $message }}</span>
+                    @enderror
                 </div>
             </div>
 
@@ -302,17 +333,23 @@
             <div class="grid grid-cols-1 gap-x-6 gap-y-6 sm:grid-cols-6">
                 <div class="sm:col-span-3">
                     <label for="password"
-                        class="block text-sm font-medium text-gray-700 dark:text-gray-300">{{ __('messages.Password') }}</label>
-                    <input type="password" name="password" id="password" autocomplete="Password"
+                        class="block text-sm font-medium text-gray-700 dark:text-gray-300">{{ __('messages.Password') }} * (mínimo 6 caracteres)</label>
+                    <input type="password" name="password" id="password" autocomplete="new-password"
                         class="mt-1 block w-full rounded-md border-gray-300 shadow-sm focus:border-indigo-500 focus:ring-indigo-500 dark:bg-gray-700 dark:border-gray-600 dark:text-white sm:text-sm py-2"
-                        required>
+                        required minlength="6">
+                    @error('password')
+                        <span class="text-red-500 text-sm">{{ $message }}</span>
+                    @enderror
                 </div>
                 <div class="sm:col-span-3">
-                    <label for="password"
-                        class="block text-sm font-medium text-gray-700 dark:text-gray-300">{{ __('messages.Confirm Password') }}</label>
-                    <input type="password" name="confirm_password" id="confirm_password" autocomplete="password"
+                    <label for="confirm_password"
+                        class="block text-sm font-medium text-gray-700 dark:text-gray-300">{{ __('messages.Confirm Password') }} *</label>
+                    <input type="password" name="confirm_password" id="confirm_password" autocomplete="new-password"
                         class="mt-1 block w-full rounded-md border-gray-300 shadow-sm focus:border-indigo-500 focus:ring-indigo-500 dark:bg-gray-700 dark:border-gray-600 dark:text-white sm:text-sm py-2"
-                        required>
+                        required minlength="6">
+                    @error('confirm_password')
+                        <span class="text-red-500 text-sm">{{ $message }}</span>
+                    @enderror
                 </div>
             </div>
 
