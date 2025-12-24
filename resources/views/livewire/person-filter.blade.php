@@ -1,8 +1,20 @@
 <div class="mb-6 bg-white dark:bg-gray-800 shadow-md rounded-lg p-4">
-    <form action="{{ route('person.index') }}" method="GET" class="grid grid-cols-1 md:grid-cols-3 lg:grid-cols-4 gap-4 items-end">
+    <form action="{{ route('person.index') }}" method="GET" class="grid grid-cols-1 md:grid-cols-3 lg:grid-cols-5 gap-4 items-end">
         <div class="md:col-span-1">
             <label for="name" class="block text-sm font-medium text-gray-700 dark:text-gray-300">{{ __('messages.Name') }}</label>
             <input type="text" name="name" id="name" value="{{ request('name') }}" class="mt-1 block w-full border-gray-300 dark:border-gray-600 dark:bg-gray-700 dark:text-white rounded-md shadow-sm focus:ring-indigo-500 focus:border-indigo-500 sm:text-sm">
+        </div>
+
+        <div class="md:col-span-1">
+            <label for="church_id" class="block text-sm font-medium text-gray-700 dark:text-gray-300">{{ __('messages.Church') }}</label>
+            <select id="church_id" name="church_id" class="mt-1 block w-full pl-3 pr-10 py-2 text-base border-gray-300 dark:border-gray-600 dark:bg-gray-700 dark:text-white focus:outline-none focus:ring-indigo-500 focus:border-indigo-500 sm:text-sm rounded-md">
+                <option value="">Todas</option>
+                @foreach($churches as $church)
+                    <option value="{{ $church->id }}" {{ request('church_id') == $church->id ? 'selected' : '' }}>
+                        {{ $church->church_name }}
+                    </option>
+                @endforeach
+            </select>
         </div>
 
         <div class="md:col-span-1">
