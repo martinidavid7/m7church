@@ -52,14 +52,20 @@ class ChurchController extends Controller
                 'church_type_id' => 'required|exists:church_types,id',
                 'parent_church_id' => 'nullable|exists:churches,id',
                 'pastor_id' => 'nullable|exists:persons,id',
+                'city_id' => 'nullable|exists:cities,id',
+                'church_phone' => 'nullable|string|max:20',
+                'church_mail' => 'nullable|email|max:255',
+                'zip_code' => 'nullable|string|max:9',
                 'logo' => 'nullable|image|mimes:jpeg,png,jpg,gif,svg|max:2048',
             ];
 
             $feedback = [
                 'required' => 'O campo :attribute deve ser preenchido',
                 'exists' => 'O :attribute selecionado não é válido',
+                'email' => 'O campo :attribute deve ser um e-mail válido',
                 'image' => 'O campo :attribute deve ser uma imagem',
                 'mimes' => 'O campo :attribute deve ser do tipo: :values',
+                'max' => 'O campo :attribute não pode ter mais de :max caracteres',
             ];
 
             $attributes = [
@@ -67,6 +73,10 @@ class ChurchController extends Controller
                 'church_type_id' => 'tipo de igreja',
                 'parent_church_id' => 'igreja pai',
                 'pastor_id' => 'pastor',
+                'city_id' => 'cidade',
+                'church_phone' => 'telefone',
+                'church_mail' => 'e-mail',
+                'zip_code' => 'CEP',
                 'logo' => 'logo',
             ];
 
@@ -107,8 +117,18 @@ class ChurchController extends Controller
             Church::create($churchData);
 
             return redirect()->route('church.index')->with('success', 'Dados cadastrados com sucesso!');
+        } catch (\Illuminate\Validation\ValidationException $e) {
+            // Retorna para o formulário com os erros de validação
+            return redirect()->route('church.create')
+                ->withErrors($e->validator)
+                ->withInput();
         } catch (\Exception $e) {
-            return redirect()->route('church.create')->with('error', 'Erro ao cadastrar igreja.');
+            // Log do erro para debug
+            \Log::error('Erro ao cadastrar igreja: ' . $e->getMessage());
+
+            return redirect()->route('church.create')
+                ->withInput()
+                ->with('error', 'Erro ao cadastrar igreja: ' . $e->getMessage());
         }
     }
 
@@ -159,6 +179,10 @@ class ChurchController extends Controller
                 'church_type_id' => 'required|exists:church_types,id',
                 'parent_church_id' => 'nullable|exists:churches,id|not_in:' . $id,
                 'pastor_id' => 'nullable|exists:persons,id',
+                'city_id' => 'nullable|exists:cities,id',
+                'church_phone' => 'nullable|string|max:20',
+                'church_mail' => 'nullable|email|max:255',
+                'zip_code' => 'nullable|string|max:9',
                 'logo' => 'nullable|image|mimes:jpeg,png,jpg,gif,svg|max:2048',
             ];
 
@@ -166,8 +190,10 @@ class ChurchController extends Controller
                 'required' => 'O campo :attribute deve ser preenchido',
                 'exists' => 'O :attribute selecionado não é válido',
                 'not_in' => 'Uma igreja não pode ser pai dela mesma',
+                'email' => 'O campo :attribute deve ser um e-mail válido',
                 'image' => 'O campo :attribute deve ser uma imagem',
                 'mimes' => 'O campo :attribute deve ser do tipo: :values',
+                'max' => 'O campo :attribute não pode ter mais de :max caracteres',
             ];
 
             $attributes = [
@@ -175,6 +201,10 @@ class ChurchController extends Controller
                 'church_type_id' => 'tipo de igreja',
                 'parent_church_id' => 'igreja pai',
                 'pastor_id' => 'pastor',
+                'city_id' => 'cidade',
+                'church_phone' => 'telefone',
+                'church_mail' => 'e-mail',
+                'zip_code' => 'CEP',
                 'logo' => 'logo',
             ];
 
