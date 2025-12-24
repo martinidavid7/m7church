@@ -7,6 +7,7 @@ use App\Models\Church;
 use App\Models\City;
 use App\Models\UF;
 use App\Models\Person;
+use App\Models\ChurchType;
 use Illuminate\Http\Request;
 
 class ChurchController extends Controller
@@ -16,7 +17,7 @@ class ChurchController extends Controller
      */
     public function index(): View
     {
-        $church = Church::with('pastor')->get();
+        $church = Church::with(['pastor', 'churchType', 'parentChurch'])->get();
         return view('registrations.church_list', ['churchFull' => $church]);
     }
 
@@ -28,7 +29,15 @@ class ChurchController extends Controller
         $cities = City::all();
         $uf = UF::all();
         $persons = Person::where('active', 1)->orderBy('name')->get();
-        return view('registrations.church_create', ['uf' => $uf, 'cities' => $cities, 'persons' => $persons]);
+        $churchTypes = ChurchType::all();
+        $churches = Church::orderBy('church_name')->get();
+        return view('registrations.church_create', [
+            'uf' => $uf,
+            'cities' => $cities,
+            'persons' => $persons,
+            'churchTypes' => $churchTypes,
+            'churches' => $churches
+        ]);
     }
 
     /**
@@ -40,6 +49,8 @@ class ChurchController extends Controller
             // Validação
             $rules = [
                 'church_name' => 'required|string|max:255',
+                'church_type_id' => 'required|exists:church_types,id',
+                'parent_church_id' => 'nullable|exists:churches,id',
                 'pastor_id' => 'nullable|exists:persons,id',
                 'logo' => 'nullable|image|mimes:jpeg,png,jpg,gif,svg|max:2048',
             ];
@@ -53,6 +64,8 @@ class ChurchController extends Controller
 
             $attributes = [
                 'church_name' => 'nome da igreja',
+                'church_type_id' => 'tipo de igreja',
+                'parent_church_id' => 'igreja pai',
                 'pastor_id' => 'pastor',
                 'logo' => 'logo',
             ];
@@ -82,7 +95,9 @@ class ChurchController extends Controller
                 'city_id',
                 'church_phone',
                 'church_mail',
-                'pastor_id'
+                'pastor_id',
+                'church_type_id',
+                'parent_church_id'
             ]);
 
             if ($logoPath) {
@@ -115,7 +130,16 @@ class ChurchController extends Controller
             $cities = City::all();
             $uf = UF::all();
             $persons = Person::where('active', 1)->orderBy('name')->get();
-            return view('registrations.church', ['church' => $church, 'cities' => $cities, 'uf' => $uf, 'persons' => $persons]);
+            $churchTypes = ChurchType::all();
+            $churches = Church::where('id', '!=', $id)->orderBy('church_name')->get();
+            return view('registrations.church', [
+                'church' => $church,
+                'cities' => $cities,
+                'uf' => $uf,
+                'persons' => $persons,
+                'churchTypes' => $churchTypes,
+                'churches' => $churches
+            ]);
         } catch (\Exception $e) {
             return redirect()->route('church.index')->with('error', 'Igreja não encontrada ou erro ao carregar.');
         }
@@ -132,6 +156,8 @@ class ChurchController extends Controller
             // Validação
             $rules = [
                 'church_name' => 'required|string|max:255',
+                'church_type_id' => 'required|exists:church_types,id',
+                'parent_church_id' => 'nullable|exists:churches,id|not_in:' . $id,
                 'pastor_id' => 'nullable|exists:persons,id',
                 'logo' => 'nullable|image|mimes:jpeg,png,jpg,gif,svg|max:2048',
             ];
@@ -139,12 +165,15 @@ class ChurchController extends Controller
             $feedback = [
                 'required' => 'O campo :attribute deve ser preenchido',
                 'exists' => 'O :attribute selecionado não é válido',
+                'not_in' => 'Uma igreja não pode ser pai dela mesma',
                 'image' => 'O campo :attribute deve ser uma imagem',
                 'mimes' => 'O campo :attribute deve ser do tipo: :values',
             ];
 
             $attributes = [
                 'church_name' => 'nome da igreja',
+                'church_type_id' => 'tipo de igreja',
+                'parent_church_id' => 'igreja pai',
                 'pastor_id' => 'pastor',
                 'logo' => 'logo',
             ];
@@ -168,7 +197,9 @@ class ChurchController extends Controller
                 'city_id',
                 'church_phone',
                 'church_mail',
-                'pastor_id'
+                'pastor_id',
+                'church_type_id',
+                'parent_church_id'
             ]);
 
             // Upload do logo se houver
