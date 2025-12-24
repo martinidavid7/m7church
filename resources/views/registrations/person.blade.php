@@ -244,6 +244,23 @@
 
             <div class="grid grid-cols-1 gap-x-6 gap-y-6 sm:grid-cols-6">
                 <div class="sm:col-span-2">
+                    <label for="church_id"
+                        class="block text-sm font-medium text-gray-700 dark:text-gray-300">Igreja</label>
+                    <select name="church_id" id="church_id"
+                        class="mt-1 block w-full rounded-md border-gray-300 shadow-sm focus:border-indigo-500 focus:ring-indigo-500 dark:bg-gray-700 dark:border-gray-600 dark:text-white sm:text-sm py-2">
+                        <option value="">Selecione uma Igreja</option>
+                        @foreach ($churches as $church)
+                            <option value="{{ $church->id }}" {{ ($person->church_id ?? old('church_id')) == $church->id ? 'selected' : '' }}>
+                                {{ $church->church_name }}
+                            </option>
+                        @endforeach
+                    </select>
+                    @error('church_id')
+                        <span class="text-red-500 text-sm">{{ $message }}</span>
+                    @enderror
+                </div>
+
+                <div class="sm:col-span-2">
                     <label for="baptism_date"
                         class="block text-sm font-medium text-gray-700 dark:text-gray-300">Data de Batismo</label>
                     <input type="date" name="baptism_date" id="baptism_date"
