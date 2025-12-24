@@ -4,6 +4,7 @@ namespace App\Models;
 
 use Illuminate\Database\Eloquent\Model;
 use App\Models\City;
+use App\Models\Church;
 
 
 
@@ -32,7 +33,8 @@ class Person extends Model
         'active',
         'observations',
         'user_id',
-        'city_id'
+        'city_id',
+        'church_id'
     ];
 
     protected $casts = [
@@ -44,6 +46,10 @@ class Person extends Model
 
     public function city(){
         return $this->belongsTo(City::class, 'city_id');
+    }
+
+    public function church(){
+        return $this->belongsTo(Church::class, 'church_id');
     }
 
     // Family relationships
