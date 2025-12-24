@@ -2,7 +2,22 @@
     <div class="p-6">
         <h1 class="text-2xl font-semibold text-gray-900 dark:text-white mb-6">{{ __('messages.Register') }} {{ __('messages.Church') }}</h1>
 
-        <form action="store" method="POST" enctype="multipart/form-data" x-data class="space-y-6">
+        @if(session('error'))
+            <div class="mb-4 rounded-md bg-red-50 p-4">
+                <div class="flex">
+                    <div class="flex-shrink-0">
+                        <svg class="h-5 w-5 text-red-400" viewBox="0 0 20 20" fill="currentColor">
+                            <path fill-rule="evenodd" d="M10 18a8 8 0 100-16 8 8 0 000 16zM8.707 7.293a1 1 0 00-1.414 1.414L8.586 10l-1.293 1.293a1 1 0 101.414 1.414L10 11.414l1.293 1.293a1 1 0 001.414-1.414L11.414 10l1.293-1.293a1 1 0 00-1.414-1.414L10 8.586 8.707 7.293z" clip-rule="evenodd" />
+                        </svg>
+                    </div>
+                    <div class="ml-3">
+                        <p class="text-sm font-medium text-red-800">{{ session('error') }}</p>
+                    </div>
+                </div>
+            </div>
+        @endif
+
+        <form action="{{ route('church.store') }}" method="POST" enctype="multipart/form-data" x-data class="space-y-6">
             @csrf {{-- Token CSRF para segurança --}}
 
             <div class="grid grid-cols-1 gap-x-6 gap-y-6 sm:grid-cols-6">
@@ -29,34 +44,49 @@
             <div class="grid grid-cols-1 gap-x-6 gap-y-6 sm:grid-cols-6">
                 <div class="sm:col-span-4">
                     <label for="address" class="block text-sm font-medium text-gray-700 dark:text-gray-300">{{__('messages.Address')}}</label>
-                    <input type="text" name="address" id="address" autocomplete="Address"
+                    <input type="text" name="address" id="address" autocomplete="Address" value="{{ old('address') }}"
                         class="mt-1 block w-full rounded-md border-gray-300 shadow-sm focus:border-indigo-500 focus:ring-indigo-500 dark:bg-gray-700 dark:border-gray-600 dark:text-white sm:text-sm py-2">
+                    @error('address')
+                        <span class="text-red-500 text-sm">{{ $message }}</span>
+                    @enderror
                 </div>
 
                 <div class="sm:col-span-2">
                     <label for="number" class="block text-sm font-medium text-gray-700 dark:text-gray-300">{{__('messages.Number')}}</label>
-                    <input type="text" name="number" id="number" autocomplete="Number"
+                    <input type="text" name="number" id="number" autocomplete="Number" value="{{ old('number') }}"
                         class="mt-1 block w-full rounded-md border-gray-300 shadow-sm focus:border-indigo-500 focus:ring-indigo-500 dark:bg-gray-700 dark:border-gray-600 dark:text-white sm:text-sm py-2">
+                    @error('number')
+                        <span class="text-red-500 text-sm">{{ $message }}</span>
+                    @enderror
                 </div>
             </div>
             <div class="grid grid-cols-1 gap-x-6 gap-y-6 sm:grid-cols-6">
                 <div class="sm:col-span-3">
                     <label for="neighborhood" class="block text-sm font-medium text-gray-700 dark:text-gray-300">{{__('messages.Neighborhood')}}</label>
-                    <input type="text" name="neighborhood" id="neighborhood" autocomplete="neighborhood"
+                    <input type="text" name="neighborhood" id="neighborhood" autocomplete="neighborhood" value="{{ old('neighborhood') }}"
                         class="mt-1 block w-full rounded-md border-gray-300 shadow-sm focus:border-indigo-500 focus:ring-indigo-500 dark:bg-gray-700 dark:border-gray-600 dark:text-white sm:text-sm py-2">
+                    @error('neighborhood')
+                        <span class="text-red-500 text-sm">{{ $message }}</span>
+                    @enderror
                 </div>
 
                 <div class="sm:col-span-3">
                     <label for="complement" class="block text-sm font-medium text-gray-700 dark:text-gray-300">{{__('messages.Complement')}}</label>
-                    <input type="text" name="complement" id="number" autocomplete="complement"
+                    <input type="text" name="complement" id="complement" autocomplete="complement" value="{{ old('complement') }}"
                         class="mt-1 block w-full rounded-md border-gray-300 shadow-sm focus:border-indigo-500 focus:ring-indigo-500 dark:bg-gray-700 dark:border-gray-600 dark:text-white sm:text-sm py-2">
+                    @error('complement')
+                        <span class="text-red-500 text-sm">{{ $message }}</span>
+                    @enderror
                 </div>
             </div>
             <div class="grid grid-cols-1 gap-x-6 gap-y-6 sm:grid-cols-6">
                 <div class="sm:col-span-2">
                     <label for="zip_code" class="block text-sm font-medium text-gray-700 dark:text-gray-300">{{__('messages.Zip Code')}}</label>
-                    <input type="text" name="zip_code" id="zip_code" autocomplete="zip_code" x-mask="99999-999"
+                    <input type="text" name="zip_code" id="zip_code" autocomplete="zip_code" x-mask="99999-999" value="{{ old('zip_code') }}"
                         class="mt-1 block w-full rounded-md border-gray-300 shadow-sm focus:border-indigo-500 focus:ring-indigo-500 dark:bg-gray-700 dark:border-gray-600 dark:text-white sm:text-sm py-2">
+                    @error('zip_code')
+                        <span class="text-red-500 text-sm">{{ $message }}</span>
+                    @enderror
                 </div>
 
                 <div class="sm:col-span-1">
@@ -65,9 +95,12 @@
                         class="mt-1 block w-full rounded-md border-gray-300 shadow-sm focus:border-indigo-500 focus:ring-indigo-500 dark:bg-gray-700 dark:border-gray-600 dark:text-white sm:text-sm py-2">
                         <option value="">Selecione a UF</option>
                         @foreach ($uf as $state)
-                            <option value="{{ $state->id }}">{{ $state->uf }}</option>
+                            <option value="{{ $state->id }}" {{ old('uf_id') == $state->id ? 'selected' : '' }}>{{ $state->uf }}</option>
                         @endforeach
                     </select>
+                    @error('uf_id')
+                        <span class="text-red-500 text-sm">{{ $message }}</span>
+                    @enderror
                 </div>
                 <div class="sm:col-span-3">
                     <label for="city_id" class="block text-sm font-medium text-gray-700 dark:text-gray-300">{{__('messages.City')}}</label>
@@ -75,21 +108,30 @@
                         class="mt-1 block w-full rounded-md border-gray-300 shadow-sm focus:border-indigo-500 focus:ring-indigo-500 dark:bg-gray-700 dark:border-gray-600 dark:text-white sm:text-sm py-2">
                         <option value="">Selecione a Cidade</option>
                         @foreach ($cities as $city)
-                            <option value="{{ $city->id }}">{{ $city->name }}</option>
+                            <option value="{{ $city->id }}" {{ old('city_id') == $city->id ? 'selected' : '' }}>{{ $city->name }}</option>
                         @endforeach
                     </select>
+                    @error('city_id')
+                        <span class="text-red-500 text-sm">{{ $message }}</span>
+                    @enderror
                 </div>
             </div>
             <div class="grid grid-cols-1 gap-x-6 gap-y-6 sm:grid-cols-6">
                 <div class="sm:col-span-3">
                     <label for="church_phone" class="block text-sm font-medium text-gray-700 dark:text-gray-300">{{__('messages.Church Phone')}}</label>
-                    <input type="text" name="church_phone" id="church_phone" autocomplete="Church Phone" x-mask="(99) 99999-9999"
+                    <input type="text" name="church_phone" id="church_phone" autocomplete="Church Phone" x-mask="(99) 99999-9999" value="{{ old('church_phone') }}"
                         class="mt-1 block w-full rounded-md border-gray-300 shadow-sm focus:border-indigo-500 focus:ring-indigo-500 dark:bg-gray-700 dark:border-gray-600 dark:text-white sm:text-sm py-2">
+                    @error('church_phone')
+                        <span class="text-red-500 text-sm">{{ $message }}</span>
+                    @enderror
                 </div>
                 <div class="sm:col-span-3">
                     <label for="church_mail" class="block text-sm font-medium text-gray-700 dark:text-gray-300">{{__('messages.Church Mail')}}</label>
-                    <input type="email" name="church_mail" id="church_mail" autocomplete="email"
+                    <input type="email" name="church_mail" id="church_mail" autocomplete="email" value="{{ old('church_mail') }}"
                         class="mt-1 block w-full rounded-md border-gray-300 shadow-sm focus:border-indigo-500 focus:ring-indigo-500 dark:bg-gray-700 dark:border-gray-600 dark:text-white sm:text-sm py-2">
+                    @error('church_mail')
+                        <span class="text-red-500 text-sm">{{ $message }}</span>
+                    @enderror
                 </div>
             </div>
             <div class="grid grid-cols-1 gap-x-6 gap-y-6 sm:grid-cols-6">
@@ -156,10 +198,9 @@
         document.addEventListener('DOMContentLoaded', function() {
             const ufSelect = document.getElementById('uf_id');
             const citySelect = document.getElementById('city_id');
+            const oldCityId = "{{ old('city_id') }}";
 
-            ufSelect.addEventListener('change', function() {
-                const ufId = this.value;
-
+            function loadCities(ufId, selectedCityId = null) {
                 // Limpar o select de cidades
                 citySelect.innerHTML = '<option value="">Selecione a Cidade</option>';
 
@@ -172,6 +213,10 @@
                                 const option = document.createElement('option');
                                 option.value = city.id;
                                 option.textContent = city.name;
+                                // Selecionar a cidade antiga se houver
+                                if (selectedCityId && city.id == selectedCityId) {
+                                    option.selected = true;
+                                }
                                 citySelect.appendChild(option);
                             });
                         })
@@ -179,7 +224,17 @@
                             console.error('Erro ao carregar cidades:', error);
                         });
                 }
+            }
+
+            // Carregar cidades ao mudar UF
+            ufSelect.addEventListener('change', function() {
+                loadCities(this.value);
             });
+
+            // Carregar cidades se houver UF selecionada (ao recarregar com erros de validação)
+            if (ufSelect.value && oldCityId) {
+                loadCities(ufSelect.value, oldCityId);
+            }
         });
     </script>
 </x-layouts.app>
