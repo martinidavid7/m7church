@@ -6,6 +6,7 @@ use App\Models\User;
 use App\Models\Person;
 use App\Models\City;
 use App\Models\UF;
+use App\Models\Church;
 use Illuminate\View\View;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Hash;
@@ -21,7 +22,7 @@ class PersonController extends Controller
     public function index(Request $request): View
     {
 
-        $query = Person::query();
+        $query = Person::with('church');
         $query->orderBy('name'); //Ordena por nome
 
 
@@ -31,14 +32,20 @@ class PersonController extends Controller
             $query->where('name', 'like', "%{$name}%");
         }
 
+        // Filtro por igreja
+        if ($request->filled('church_id')) {
+            $query->where('church_id', $request->input('church_id'));
+        }
+
         // Filtro por status (ativo/inativo)
         if ($request->filled('active')) {
             $query->where('active', $request->boolean('active')); // boolean() converte '1', 'true', etc.
         }
 
         $persons = $query->paginate(15);
+        $churches = Church::orderBy('church_name')->get();
 
-        return view('registrations.person_list', ['persons' => $persons]);
+        return view('registrations.person_list', ['persons' => $persons, 'churches' => $churches]);
     }
 
 
@@ -47,7 +54,8 @@ class PersonController extends Controller
     {
         $cities = City::all();
         $uf = UF::all();
-        return view('registrations.person_create', ['uf' => $uf ,'cities' => $cities]);
+        $churches = Church::orderBy('church_name')->get();
+        return view('registrations.person_create', ['uf' => $uf, 'cities' => $cities, 'churches' => $churches]);
     }
 
 
@@ -143,7 +151,8 @@ class PersonController extends Controller
                 'membership_date',
                 'active',
                 'observations',
-                'city_id'
+                'city_id',
+                'church_id'
             ]);
 
             $personData['user_id'] = $user->id;
@@ -184,8 +193,9 @@ class PersonController extends Controller
             $person = Person::findOrFail($id);
             $cities = City::all();
             $uf = UF::all();
+            $churches = Church::orderBy('church_name')->get();
 
-            return view('registrations.person', ['person' => $person, 'cities' => $cities, 'uf' => $uf]);
+            return view('registrations.person', ['person' => $person, 'cities' => $cities, 'uf' => $uf, 'churches' => $churches]);
         } catch (Exception $e) {
 
             return redirect()->route('church')->with('error', 'Pessoa não encontrada ou erro ao carregar.');
@@ -268,7 +278,8 @@ class PersonController extends Controller
                 'membership_date',
                 'active',
                 'observations',
-                'city_id'
+                'city_id',
+                'church_id'
             ]);
 
             // Upload da foto se houver
@@ -293,10 +304,12 @@ class PersonController extends Controller
 
             return redirect()->route('person.index')->with('success', 'Dados atualizados com sucesso!');
         } catch (\Exception $e) {
+            // Log do erro para debug
+            \Log::error('Erro ao atualizar pessoa: ' . $e->getMessage());
 
             return redirect()->route('person.edit', ['id' => $id])
                 ->withInput()
-                ->with('error', 'Ocorreu um erro ao atualizar o membro.');
+                ->with('error', 'Ocorreu um erro ao atualizar o membro: ' . $e->getMessage());
         }
     }
 
