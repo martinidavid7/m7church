@@ -42,7 +42,7 @@ class PersonController extends Controller
             $query->where('active', $request->boolean('active')); // boolean() converte '1', 'true', etc.
         }
 
-        $persons = $query->paginate(15);
+        $persons = $query->paginate(5);
         $churches = Church::orderBy('church_name')->get();
 
         return view('registrations.person_list', ['persons' => $persons, 'churches' => $churches]);
@@ -55,7 +55,8 @@ class PersonController extends Controller
         $cities = City::all();
         $uf = UF::all();
         $churches = Church::orderBy('church_name')->get();
-        return view('registrations.person_create', ['uf' => $uf, 'cities' => $cities, 'churches' => $churches]);
+        $roles = \Spatie\Permission\Models\Role::all();
+        return view('registrations.person_create', ['uf' => $uf, 'cities' => $cities, 'churches' => $churches, 'roles' => $roles]);
     }
 
 
@@ -161,7 +162,14 @@ class PersonController extends Controller
             }
 
             // 3. Criar a pessoa usando atribuição em massa
-            Person::create($personData);
+            $person = Person::create($personData);
+
+
+
+            // 4. Associar roles ao usuário se foram selecionados (usando Spatie)
+            if ($request->has('roles') && is_array($request->roles)) {
+                $user->syncRoles($request->roles);
+            }
 
             return redirect()->route('person.index')->with('success', 'Membro e usuário cadastrados com sucesso!');
         } catch (\Illuminate\Database\QueryException $e) {
@@ -194,8 +202,25 @@ class PersonController extends Controller
             $cities = City::all();
             $uf = UF::all();
             $churches = Church::orderBy('church_name')->get();
+            $roles = \Spatie\Permission\Models\Role::all();
 
-            return view('registrations.person', ['person' => $person, 'cities' => $cities, 'uf' => $uf, 'churches' => $churches]);
+            // Verificar se a pessoa tem user_id e buscar roles (usando Spatie)
+            $personRoles = [];
+            if ($person->user_id) {
+                $user = User::find($person->user_id);
+                if ($user) {
+                    $personRoles = $user->roles->pluck('name')->toArray();
+                }
+            }
+
+            return view('registrations.person', [
+                'person' => $person,
+                'cities' => $cities,
+                'uf' => $uf,
+                'churches' => $churches,
+                'roles' => $roles,
+                'personRoles' => $personRoles
+            ]);
         } catch (Exception $e) {
 
             return redirect()->route('church')->with('error', 'Pessoa não encontrada ou erro ao carregar.');
@@ -223,6 +248,7 @@ class PersonController extends Controller
                 'education_level' => 'nullable|string|max:100',
                 'photo' => 'nullable|image|mimes:jpeg,png,jpg,gif|max:2048',
                 'baptism_date' => 'nullable|date',
+                'password' => 'nullable|min:6',
             ];
 
             $feedback = [
@@ -233,6 +259,7 @@ class PersonController extends Controller
                 'date' => 'O campo :attribute deve ser uma data válida',
                 'image' => 'O campo :attribute deve ser uma imagem',
                 'mimes' => 'O campo :attribute deve ser do tipo: :values',
+                'min' => 'O campo :attribute deve ter no mínimo :min caracteres',
             ];
 
             $attributes = [
@@ -247,6 +274,7 @@ class PersonController extends Controller
                 'education_level' => 'escolaridade',
                 'photo' => 'foto',
                 'baptism_date' => 'data de batismo',
+                'password' => 'senha',
             ];
 
             $request->validate($rules, $feedback, $attributes);
@@ -294,12 +322,27 @@ class PersonController extends Controller
             $person->update($personData);
 
             // Atualizar usuário relacionado
-            $user = User::find($person->user_id);
-            if ($user) {
-                $user->name = $request->input('name');
-                $user->email = $request->input('mail');
-                $user->active = $request->input('active', 1);
-                $user->save();
+            if ($person->user_id) {
+                $user = User::find($person->user_id);
+                if ($user) {
+                    $user->name = $request->input('name');
+                    $user->email = $request->input('mail');
+                    $user->active = $request->input('active', 1);
+
+                    // Atualizar senha se foi fornecida
+                    if ($request->filled('password')) {
+                        $user->password = Hash::make($request->input('password'));
+                    }
+
+                    $user->save();
+
+                    // Atualizar roles do usuário (usando Spatie)
+                    if ($request->has('roles') && is_array($request->roles)) {
+                        $user->syncRoles($request->roles);
+                    } else {
+                        $user->syncRoles([]);
+                    }
+                }
             }
 
             return redirect()->route('person.index')->with('success', 'Dados atualizados com sucesso!');
@@ -336,11 +379,184 @@ class PersonController extends Controller
     }
 
     /**
+     * Editar próprio perfil
+     */
+    public function editMyProfile()
+    {
+        $user = auth()->user();
+        $person = Person::where('user_id', $user->id)->first();
+
+        // Se o usuário não tem um registro de pessoa vinculado, criar um básico
+        if (!$person) {
+            $person = Person::create([
+                'user_id' => $user->id,
+                'name' => $user->name,
+                'mail' => $user->email,
+                'active' => 1
+            ]);
+        }
+
+        $cities = City::all();
+        $uf = UF::all();
+        $churches = Church::orderBy('church_name')->get();
+
+        // Usuário não pode alterar os próprios roles
+        return view('registrations.person_my_profile', [
+            'person' => $person,
+            'cities' => $cities,
+            'uf' => $uf,
+            'churches' => $churches
+        ]);
+    }
+
+    /**
+     * Atualizar próprio perfil
+     */
+    public function updateMyProfile(Request $request)
+    {
+        try {
+            $user = auth()->user();
+            $person = Person::where('user_id', $user->id)->first();
+
+            // Se o usuário não tem um registro de pessoa vinculado, criar um básico
+            if (!$person) {
+                $person = Person::create([
+                    'user_id' => $user->id,
+                    'name' => $user->name,
+                    'mail' => $user->email,
+                    'active' => 1
+                ]);
+            }
+
+            // Regras de validação
+            $rules = [
+                'name' => 'required|string|max:255',
+                'birth_date' => 'nullable|date',
+                'gender' => 'nullable|in:M,F',
+                'marital_status' => 'nullable|string|max:50',
+                'mail' => 'required|email',
+                'mobile_phone' => 'nullable',
+                'landline_phone' => 'nullable',
+                'profession' => 'nullable|string|max:100',
+                'education_level' => 'nullable|string|max:100',
+                'photo' => 'nullable|image|mimes:jpeg,png,jpg,gif|max:2048',
+                'baptism_date' => 'nullable|date',
+                'password' => 'nullable|min:6',
+            ];
+
+            $feedback = [
+                'required' => 'O campo :attribute deve ser preenchido',
+                'email' => 'O campo :attribute precisa ser um e-mail válido',
+                'max' => 'O campo :attribute deve ter no máximo :max caracteres',
+                'in' => 'O campo :attribute deve ser M ou F',
+                'date' => 'O campo :attribute deve ser uma data válida',
+                'image' => 'O campo :attribute deve ser uma imagem',
+                'mimes' => 'O campo :attribute deve ser do tipo: :values',
+                'min' => 'O campo :attribute deve ter no mínimo :min caracteres',
+            ];
+
+            $attributes = [
+                'name' => 'nome',
+                'birth_date' => 'data de nascimento',
+                'gender' => 'sexo',
+                'marital_status' => 'estado civil',
+                'mail' => 'e-mail',
+                'mobile_phone' => 'telefone celular',
+                'landline_phone' => 'telefone fixo',
+                'profession' => 'profissão',
+                'education_level' => 'escolaridade',
+                'photo' => 'foto',
+                'baptism_date' => 'data de batismo',
+                'password' => 'senha',
+            ];
+
+            $request->validate($rules, $feedback, $attributes);
+
+            // Limpar máscaras
+            $request->merge([
+                'zip_code' => preg_replace('/[^0-9]/', '', $request->zip_code ?? ''),
+                'mobile_phone' => preg_replace('/[^0-9]/', '', $request->mobile_phone ?? ''),
+                'landline_phone' => preg_replace('/[^0-9]/', '', $request->landline_phone ?? ''),
+            ]);
+
+            // Preparar dados
+            $personData = $request->only([
+                'name',
+                'birth_date',
+                'gender',
+                'marital_status',
+                'address',
+                'number',
+                'neighborhood',
+                'complement',
+                'zip_code',
+                'landline_phone',
+                'mobile_phone',
+                'mail',
+                'profession',
+                'education_level',
+                'baptism_date',
+                'membership_date',
+                'observations',
+                'city_id',
+                'church_id'
+            ]);
+
+            // Upload da foto
+            if ($request->hasFile('photo')) {
+                if ($person->photo && \Storage::disk('public')->exists($person->photo)) {
+                    \Storage::disk('public')->delete($person->photo);
+                }
+                $personData['photo'] = $request->file('photo')->store('persons/photos', 'public');
+            }
+
+            $person->update($personData);
+
+            // Atualizar usuário
+            $user->name = $request->input('name');
+            $user->email = $request->input('mail');
+
+            // Atualizar senha se foi fornecida
+            if ($request->filled('password')) {
+                $user->password = Hash::make($request->input('password'));
+            }
+
+            $user->save();
+
+            return redirect()->route('person.my-profile')->with('success', 'Perfil atualizado com sucesso!');
+        } catch (\Exception $e) {
+            \Log::error('Erro ao atualizar perfil: ' . $e->getMessage());
+            return redirect()->route('person.my-profile')
+                ->withInput()
+                ->with('error', 'Ocorreu um erro ao atualizar o perfil.');
+        }
+    }
+
+    /**
      * Gerar ficha de cadastro em branco
      */
     public function printBlankForm()
     {
         $church = \App\Models\Church::with('pastor')->first();
         return view('registrations.person_blank_form', ['church' => $church]);
+    }
+
+    /**
+     * Gerar ficha de cadastro preenchida para impressão
+     */
+    public function print($id)
+    {
+        $person = Person::with(['church', 'city.uf'])->findOrFail($id);
+
+        // Buscar cargos/roles do usuário vinculado
+        $rolesString = '';
+        if ($person->user_id) {
+            $user = User::find($person->user_id);
+            if ($user) {
+                $rolesString = $user->roles->pluck('name')->implode(', ');
+            }
+        }
+
+        return view('registrations.person_print', compact('person', 'rolesString'));
     }
 }
