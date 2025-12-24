@@ -287,6 +287,44 @@
                 </div>
             </div>
 
+            {{-- Acesso ao Sistema --}}
+            <div class="border-b border-gray-200 dark:border-gray-700 pb-4 pt-6">
+                <h2 class="text-lg font-semibold text-gray-900 dark:text-white">Acesso ao Sistema</h2>
+            </div>
+
+            <div class="grid grid-cols-1 gap-x-6 gap-y-6 sm:grid-cols-6">
+                <div class="sm:col-span-6">
+                    <label class="block text-sm font-medium text-gray-700 dark:text-gray-300">Funções/Cargos</label>
+                    <div class="mt-2 space-y-2">
+                        @foreach ($roles as $role)
+                            <div class="flex items-center">
+                                <input type="checkbox" name="roles[]" id="role_{{ $role->id }}" value="{{ $role->name }}"
+                                    {{ in_array($role->name, $personRoles ?? []) ? 'checked' : '' }}
+                                    class="h-4 w-4 text-indigo-600 focus:ring-indigo-500 border-gray-300 rounded">
+                                <label for="role_{{ $role->id }}" class="ml-3 text-sm text-gray-700 dark:text-gray-300">
+                                    {{ $role->name }}
+                                </label>
+                            </div>
+                        @endforeach
+                    </div>
+                    @error('roles')
+                        <span class="text-red-500 text-sm">{{ $message }}</span>
+                    @enderror
+                </div>
+
+                <div class="sm:col-span-3">
+                    <label for="password"
+                        class="block text-sm font-medium text-gray-700 dark:text-gray-300">Nova Senha</label>
+                    <input type="password" name="password" id="password"
+                        class="mt-1 block w-full rounded-md border-gray-300 shadow-sm focus:border-indigo-500 focus:ring-indigo-500 dark:bg-gray-700 dark:border-gray-600 dark:text-white sm:text-sm py-2"
+                        placeholder="Deixe em branco para manter a senha atual">
+                    <p class="mt-1 text-xs text-gray-500 dark:text-gray-400">Mínimo de 6 caracteres. Deixe em branco se não quiser alterar.</p>
+                    @error('password')
+                        <span class="text-red-500 text-sm">{{ $message }}</span>
+                    @enderror
+                </div>
+            </div>
+
             <div>
                 <button type="submit"
                     class="inline-flex justify-center rounded-md border border-transparent bg-indigo-600 py-2 px-4 text-sm font-medium text-white shadow-sm hover:bg-indigo-700 focus:outline-none focus:ring-2 focus:ring-indigo-500 focus:ring-offset-2">

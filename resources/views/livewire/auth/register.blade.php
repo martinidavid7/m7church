@@ -7,6 +7,7 @@ use Illuminate\Support\Facades\Hash;
 use Illuminate\Validation\Rules;
 use Livewire\Attributes\Layout;
 use Livewire\Volt\Component;
+use Spatie\Permission\Models\Role;
 
 new #[Layout('components.layouts.auth')] class extends Component {
     public string $name = '';
@@ -26,8 +27,13 @@ new #[Layout('components.layouts.auth')] class extends Component {
         ]);
 
         $validated['password'] = Hash::make($validated['password']);
+        $validated['active'] = 1;
 
         event(new Registered(($user = User::create($validated))));
+
+        // Atribuir automaticamente o role "Membro" ao novo usuário
+        $membroRole = Role::firstOrCreate(['name' => 'Membro']);
+        $user->assignRole($membroRole);
 
         Auth::login($user);
 
