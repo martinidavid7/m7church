@@ -21,7 +21,13 @@ return Application::configure(basePath: dirname(__DIR__))
 
     $middleware->alias([
       'verified' => \Illuminate\Auth\Middleware\EnsureEmailIsVerified::class,
+      'role' => \Spatie\Permission\Middleware\RoleMiddleware::class,
+      'permission' => \Spatie\Permission\Middleware\PermissionMiddleware::class,
+      'role_or_permission' => \Spatie\Permission\Middleware\RoleOrPermissionMiddleware::class,
     ]);
+
+    // Garantir que todos os usuários autenticados tenham pelo menos o role "Membro"
+    $middleware->appendToGroup('web', \App\Http\Middleware\EnsureUserHasRole::class);
   })
 
 
