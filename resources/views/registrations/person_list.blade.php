@@ -1,31 +1,34 @@
 <x-layouts.app :title="__('messages.Listing') . ' ' . __('messages.Members')">
     <div class="p-6">
 
-        <div class="flex justify-between items-center mb-6">
-            <h1 class="text-2xl font-semibold text-gray-900 dark:text-white">{{ __('messages.Listing') }}
+        <div class="flex flex-col sm:flex-row justify-between items-start sm:items-center mb-6 gap-4">
+            <h1 class="text-xl sm:text-2xl font-semibold text-gray-900 dark:text-white">{{ __('messages.Listing') }}
                 {{ __('messages.Members') }}</h1>
-            <div class="flex gap-3">
+            <div class="flex flex-wrap gap-2 w-full sm:w-auto">
                 <a href="{{ route('person.print-blank-form') }}" target="_blank"
-                    class="inline-flex items-center px-4 py-2 bg-gray-600 border border-transparent rounded-md font-semibold text-xs text-white uppercase tracking-widest hover:bg-gray-700 active:bg-gray-900 focus:outline-none focus:border-gray-900 focus:ring ring-gray-300 disabled:opacity-25 transition ease-in-out duration-150">
-                    <svg class="w-4 h-4 mr-2" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                    class="inline-flex items-center justify-center px-2.5 py-1.5 sm:px-4 sm:py-2 bg-gray-600 border border-transparent rounded-md font-semibold text-xs text-white uppercase tracking-wide sm:tracking-widest hover:bg-gray-700 active:bg-gray-900 focus:outline-none focus:border-gray-900 focus:ring ring-gray-300 disabled:opacity-25 transition ease-in-out duration-150 flex-1 sm:flex-none">
+                    <svg class="w-3.5 h-3.5 sm:w-4 sm:h-4 sm:mr-2" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                         <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
                             d="M17 17h2a2 2 0 002-2v-4a2 2 0 00-2-2H5a2 2 0 00-2 2v4a2 2 0 002 2h2m2 4h6a2 2 0 002-2v-4a2 2 0 00-2-2H9a2 2 0 00-2 2v4a2 2 0 002 2zm8-12V5a2 2 0 00-2-2H9a2 2 0 00-2 2v4h10z">
                         </path>
                     </svg>
-                    {{ __('messages.Print Blank Form') }}
+                    <span class="hidden sm:inline">{{ __('messages.Print Blank Form') }}</span>
+                    <span class="sm:hidden text-[10px]">Ficha</span>
                 </a>
                 <a href="{{ route('person.export', request()->query()) }}"
-                    class="inline-flex items-center px-4 py-2 bg-green-600 border border-transparent rounded-md font-semibold text-xs text-white uppercase tracking-widest hover:bg-green-700 active:bg-green-900 focus:outline-none focus:border-green-900 focus:ring ring-green-300 disabled:opacity-25 transition ease-in-out duration-150">
-                    <svg class="w-4 h-4 mr-2" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                    class="inline-flex items-center justify-center px-2.5 py-1.5 sm:px-4 sm:py-2 bg-green-600 border border-transparent rounded-md font-semibold text-xs text-white uppercase tracking-wide sm:tracking-widest hover:bg-green-700 active:bg-green-900 focus:outline-none focus:border-green-900 focus:ring ring-green-300 disabled:opacity-25 transition ease-in-out duration-150 flex-1 sm:flex-none">
+                    <svg class="w-3.5 h-3.5 sm:w-4 sm:h-4 sm:mr-2" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                         <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
                             d="M12 10v6m0 0l-3-3m3 3l3-3m2 8H7a2 2 0 01-2-2V5a2 2 0 012-2h5.586a1 1 0 01.707.293l5.414 5.414a1 1 0 01.293.707V19a2 2 0 01-2 2z">
                         </path>
                     </svg>
-                    {{ __('messages.Export to Excel') }}
+                    <span class="hidden sm:inline">{{ __('messages.Export to Excel') }}</span>
+                    <span class="sm:hidden text-[10px]">Excel</span>
                 </a>
                 <a href="{{ route('person.create') }}"
-                    class="inline-flex items-center px-4 py-2 bg-indigo-600 border border-transparent rounded-md font-semibold text-xs text-white uppercase tracking-widest hover:bg-indigo-700 active:bg-indigo-900 focus:outline-none focus:border-indigo-900 focus:ring ring-indigo-300 disabled:opacity-25 transition ease-in-out duration-150">
-                    {{ __('messages.Add New Member') }}
+                    class="inline-flex items-center justify-center px-2.5 py-1.5 sm:px-4 sm:py-2 bg-indigo-600 border border-transparent rounded-md font-semibold text-xs text-white uppercase tracking-wide sm:tracking-widest hover:bg-indigo-700 active:bg-indigo-900 focus:outline-none focus:border-indigo-900 focus:ring ring-indigo-300 disabled:opacity-25 transition ease-in-out duration-150 flex-1 sm:flex-none">
+                    <span class="hidden sm:inline">{{ __('messages.Add New Member') }}</span>
+                    <span class="sm:hidden text-[10px]">+ Adicionar</span>
                 </a>
             </div>
         </div>
@@ -70,7 +73,7 @@
                                 <div class="flex-shrink-0 h-12 w-12">
                                     @if ($person->photo)
                                         <img class="h-12 w-12 rounded-full object-cover ring-2 ring-gray-200 dark:ring-gray-600"
-                                            src="{{ asset('storage/' . $person->photo) }}" alt="{{ $person->name }}">
+                                            src="{{ asset($person->photo) }}" alt="{{ $person->name }}">
                                     @else
                                         <div
                                             class="h-12 w-12 rounded-full bg-gray-700 dark:bg-gray-600 flex items-center justify-center ring-2 ring-gray-200 dark:ring-gray-600">

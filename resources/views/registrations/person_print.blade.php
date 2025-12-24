@@ -204,7 +204,7 @@
 
     <div class="photo-box">
         @if($person->photo)
-            <img src="{{ asset('storage/' . $person->photo) }}" style="width: 100%; height: 100%; object-fit: cover;">
+            <img src="{{ asset($person->photo) }}" style="width: 100%; height: 100%; object-fit: cover;">
         @endif
     </div>
 

@@ -138,7 +138,10 @@ class PersonController extends Controller
             // Upload da foto se existir
             $photoPath = null;
             if ($request->hasFile('photo')) {
-                $photoPath = $request->file('photo')->store('persons/photos', 'public');
+                $photo = $request->file('photo');
+                $photoName = time() . '_' . uniqid() . '.' . $photo->getClientOriginalExtension();
+                $photo->move(public_path('uploads/persons/photos'), $photoName);
+                $photoPath = 'uploads/persons/photos/' . $photoName;
                 \Log::info('Foto carregada', ['path' => $photoPath]);
             }
 
@@ -356,10 +359,13 @@ class PersonController extends Controller
             // Upload da foto se houver
             if ($request->hasFile('photo')) {
                 // Deletar foto antiga se existir
-                if ($person->photo && \Storage::disk('public')->exists($person->photo)) {
-                    \Storage::disk('public')->delete($person->photo);
+                if ($person->photo && file_exists(public_path($person->photo))) {
+                    unlink(public_path($person->photo));
                 }
-                $personData['photo'] = $request->file('photo')->store('persons/photos', 'public');
+                $photo = $request->file('photo');
+                $photoName = time() . '_' . uniqid() . '.' . $photo->getClientOriginalExtension();
+                $photo->move(public_path('uploads/persons/photos'), $photoName);
+                $personData['photo'] = 'uploads/persons/photos/' . $photoName;
             }
 
             $person->update($personData);
@@ -553,10 +559,13 @@ class PersonController extends Controller
 
             // Upload da foto
             if ($request->hasFile('photo')) {
-                if ($person->photo && \Storage::disk('public')->exists($person->photo)) {
-                    \Storage::disk('public')->delete($person->photo);
+                if ($person->photo && file_exists(public_path($person->photo))) {
+                    unlink(public_path($person->photo));
                 }
-                $personData['photo'] = $request->file('photo')->store('persons/photos', 'public');
+                $photo = $request->file('photo');
+                $photoName = time() . '_' . uniqid() . '.' . $photo->getClientOriginalExtension();
+                $photo->move(public_path('uploads/persons/photos'), $photoName);
+                $personData['photo'] = 'uploads/persons/photos/' . $photoName;
             }
 
             $person->update($personData);

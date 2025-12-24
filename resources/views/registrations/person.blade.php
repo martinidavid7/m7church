@@ -80,7 +80,7 @@
                         class="block text-sm font-medium text-gray-700 dark:text-gray-300">Foto</label>
                     @if($person->photo)
                         <div class="mb-2">
-                            <img src="{{ asset('storage/' . $person->photo) }}" alt="Foto atual" class="w-20 h-20 object-cover rounded-full">
+                            <img src="{{ asset($person->photo) }}" alt="Foto atual" class="w-20 h-20 object-cover rounded-full">
                             <p class="text-xs text-gray-500 dark:text-gray-400 mt-1">Foto atual</p>
                         </div>
                     @endif
