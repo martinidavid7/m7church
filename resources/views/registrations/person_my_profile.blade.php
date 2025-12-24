@@ -3,6 +3,36 @@
         <h1 class="text-2xl font-semibold text-gray-900 dark:text-white mb-6">Meu Perfil
         </h1>
 
+        @if(session('success'))
+            <div class="mb-4 rounded-md bg-green-50 p-4">
+                <div class="flex">
+                    <div class="flex-shrink-0">
+                        <svg class="h-5 w-5 text-green-400" viewBox="0 0 20 20" fill="currentColor">
+                            <path fill-rule="evenodd" d="M10 18a8 8 0 100-16 8 8 0 000 16zm3.707-9.293a1 1 0 00-1.414-1.414L9 10.586 7.707 9.293a1 1 0 00-1.414 1.414l2 2a1 1 0 001.414 0l4-4z" clip-rule="evenodd" />
+                        </svg>
+                    </div>
+                    <div class="ml-3">
+                        <p class="text-sm font-medium text-green-800">{{ session('success') }}</p>
+                    </div>
+                </div>
+            </div>
+        @endif
+
+        @if(session('error'))
+            <div class="mb-4 rounded-md bg-red-50 p-4">
+                <div class="flex">
+                    <div class="flex-shrink-0">
+                        <svg class="h-5 w-5 text-red-400" viewBox="0 0 20 20" fill="currentColor">
+                            <path fill-rule="evenodd" d="M10 18a8 8 0 100-16 8 8 0 000 16zM8.707 7.293a1 1 0 00-1.414 1.414L8.586 10l-1.293 1.293a1 1 0 101.414 1.414L10 11.414l1.293 1.293a1 1 0 001.414-1.414L11.414 10l1.293-1.293a1 1 0 00-1.414-1.414L10 8.586 8.707 7.293z" clip-rule="evenodd" />
+                        </svg>
+                    </div>
+                    <div class="ml-3">
+                        <p class="text-sm font-medium text-red-800">{{ session('error') }}</p>
+                    </div>
+                </div>
+            </div>
+        @endif
+
         <form action="{{ route('person.update-my-profile') }}" method="POST" enctype="multipart/form-data" x-data class="space-y-6">
             @csrf {{-- Token CSRF para segurança --}}
             @method('PUT')
@@ -288,9 +318,20 @@
                         class="block text-sm font-medium text-gray-700 dark:text-gray-300">Nova Senha</label>
                     <input type="password" name="password" id="password"
                         class="mt-1 block w-full rounded-md border-gray-300 shadow-sm focus:border-indigo-500 focus:ring-indigo-500 dark:bg-gray-700 dark:border-gray-600 dark:text-white sm:text-sm py-2"
-                        placeholder="Deixe em branco para manter a senha atual">
+                        placeholder="Deixe em branco para manter a senha atual" minlength="6">
                     <p class="mt-1 text-xs text-gray-500 dark:text-gray-400">Mínimo de 6 caracteres. Deixe em branco se não quiser alterar.</p>
                     @error('password')
+                        <span class="text-red-500 text-sm">{{ $message }}</span>
+                    @enderror
+                </div>
+                <div class="sm:col-span-3">
+                    <label for="confirm_password"
+                        class="block text-sm font-medium text-gray-700 dark:text-gray-300">Confirmar Nova Senha</label>
+                    <input type="password" name="confirm_password" id="confirm_password"
+                        class="mt-1 block w-full rounded-md border-gray-300 shadow-sm focus:border-indigo-500 focus:ring-indigo-500 dark:bg-gray-700 dark:border-gray-600 dark:text-white sm:text-sm py-2"
+                        placeholder="Digite a senha novamente" minlength="6">
+                    <p class="mt-1 text-xs text-gray-500 dark:text-gray-400">Deve ser igual à nova senha.</p>
+                    @error('confirm_password')
                         <span class="text-red-500 text-sm">{{ $message }}</span>
                     @enderror
                 </div>
