@@ -63,35 +63,46 @@ class PersonController extends Controller
     public function store(Request $request)
     {
         // Inicia uma transação para garantir que ou ambos são criados, ou nenhum
-        try {
+        DB::beginTransaction();
 
+        try {
+            \Log::info('Iniciando cadastro de pessoa', ['dados' => $request->except(['password', 'confirm_password', 'photo'])]);
 
             //regras de validacao
             $rules = [
                 'name' => 'required|string|max:255',
-                'birth_date' => 'nullable|date',
+                'birth_date' => 'nullable|date|before:today',
                 'gender' => 'nullable|in:M,F',
                 'marital_status' => 'nullable|string|max:50',
-                'mail' => 'required|email',
-                'mobile_phone' => 'required',
-                'landline_phone' => 'nullable',
+                'mail' => 'required|email|unique:users,email',
+                'mobile_phone' => 'required|string|min:10',
+                'landline_phone' => 'nullable|string',
                 'profession' => 'nullable|string|max:100',
                 'education_level' => 'nullable|string|max:100',
                 'photo' => 'nullable|image|mimes:jpeg,png,jpg,gif|max:2048',
                 'baptism_date' => 'nullable|date',
-                'password' => 'required|min:6'
+                'membership_date' => 'nullable|date',
+                'password' => 'required|string|min:6',
+                'confirm_password' => 'required|same:password',
+                'active' => 'required|in:0,1',
+                'city_id' => 'nullable|exists:cities,id',
+                'church_id' => 'nullable|exists:churches,id',
             ];
 
             //feedback de validacao
             $feedback = [
                 'required' => 'O campo :attribute deve ser preenchido',
                 'email' => 'O campo :attribute precisa ser um e-mail válido',
+                'unique' => 'Este :attribute já está cadastrado no sistema',
                 'min' => 'O campo :attribute deve ter no mínimo :min caracteres',
                 'max' => 'O campo :attribute deve ter no máximo :max caracteres',
-                'in' => 'O campo :attribute deve ser M ou F',
+                'in' => 'O campo :attribute deve ser uma opção válida',
                 'date' => 'O campo :attribute deve ser uma data válida',
+                'before' => 'O campo :attribute deve ser uma data anterior a hoje',
                 'image' => 'O campo :attribute deve ser uma imagem',
                 'mimes' => 'O campo :attribute deve ser do tipo: :values',
+                'same' => 'O campo :attribute deve ser igual ao campo senha',
+                'exists' => 'O :attribute selecionado não é válido',
             ];
 
             // Personalizar nomes dos atributos
@@ -107,7 +118,12 @@ class PersonController extends Controller
                 'education_level' => 'escolaridade',
                 'photo' => 'foto',
                 'baptism_date' => 'data de batismo',
+                'membership_date' => 'data de membresia',
                 'password' => 'senha',
+                'confirm_password' => 'confirmação de senha',
+                'active' => 'status',
+                'city_id' => 'cidade',
+                'church_id' => 'igreja',
             ];
 
             $request->validate($rules, $feedback, $attributes);
@@ -123,14 +139,17 @@ class PersonController extends Controller
             $photoPath = null;
             if ($request->hasFile('photo')) {
                 $photoPath = $request->file('photo')->store('persons/photos', 'public');
+                \Log::info('Foto carregada', ['path' => $photoPath]);
             }
 
             // 1. Criar o usuário
+            \Log::info('Criando usuário', ['nome' => $request->input('name'), 'email' => $request->input('mail')]);
             $user = User::create([
                 'name' => $request->input('name'),
                 'email' => $request->input('mail'),
                 'password' => Hash::make($request->input('password')),
             ]);
+            \Log::info('Usuário criado', ['user_id' => $user->id]);
 
             // 2. Preparar os dados para a pessoa (apenas campos que existem na tabela)
             $personData = $request->only([
@@ -162,17 +181,35 @@ class PersonController extends Controller
             }
 
             // 3. Criar a pessoa usando atribuição em massa
+            \Log::info('Criando pessoa', ['dados' => $personData]);
             $person = Person::create($personData);
-
-
+            \Log::info('Pessoa criada', ['person_id' => $person->id]);
 
             // 4. Associar roles ao usuário se foram selecionados (usando Spatie)
             if ($request->has('roles') && is_array($request->roles)) {
+                \Log::info('Associando roles', ['roles' => $request->roles]);
                 $user->syncRoles($request->roles);
             }
 
+            DB::commit();
+            \Log::info('Cadastro de pessoa concluído com sucesso');
+
             return redirect()->route('person.index')->with('success', 'Membro e usuário cadastrados com sucesso!');
+        } catch (\Illuminate\Validation\ValidationException $e) {
+            DB::rollBack();
+            \Log::error('Erro de validação ao cadastrar pessoa', [
+                'errors' => $e->errors(),
+                'message' => $e->getMessage()
+            ]);
+            throw $e;
         } catch (\Illuminate\Database\QueryException $e) {
+            DB::rollBack();
+            \Log::error('Erro de banco de dados ao cadastrar pessoa', [
+                'message' => $e->getMessage(),
+                'sql' => $e->getSql(),
+                'bindings' => $e->getBindings()
+            ]);
+
             // Verificar se é erro de email duplicado
             if ($e->errorInfo[1] == 1062 && str_contains($e->getMessage(), 'users_email_unique')) {
                 return redirect()->route('person.create')
@@ -183,11 +220,17 @@ class PersonController extends Controller
             // Outros erros de banco de dados
             return redirect()->route('person.create')
                 ->withInput()
-                ->with('error', 'Erro ao realizar o cadastro! Verifique os dados e tente novamente.');
+                ->with('error', 'Erro ao realizar o cadastro! Erro de banco de dados: ' . $e->getMessage());
         } catch (Exception $e) {
+            DB::rollBack();
+            \Log::error('Erro geral ao cadastrar pessoa', [
+                'message' => $e->getMessage(),
+                'trace' => $e->getTraceAsString()
+            ]);
+
             return redirect()->route('person.create')
                 ->withInput()
-                ->with('error', 'Erro ao realizar o cadastro! Contate o Suporte.');
+                ->with('error', 'Erro ao realizar o cadastro! ' . $e->getMessage());
         }
     }
 
