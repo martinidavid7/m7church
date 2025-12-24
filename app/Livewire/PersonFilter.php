@@ -5,6 +5,7 @@ namespace App\Livewire;
 use Livewire\Component;
 use Livewire\WithPagination;
 use App\Models\Person;
+use App\Models\Church;
 
 class PersonFilter extends Component
 {
@@ -37,8 +38,11 @@ class PersonFilter extends Component
             ->orderBy('name')
             ->paginate(15);
 
+        $churches = Church::orderBy('church_name')->get();
+
         return view('livewire.person-filter', [
-            'persons' => $persons
+            'persons' => $persons,
+            'churches' => $churches
         ]);
     }
 }
