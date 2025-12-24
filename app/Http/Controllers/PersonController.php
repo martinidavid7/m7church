@@ -474,28 +474,32 @@ class PersonController extends Controller
             // Regras de validação
             $rules = [
                 'name' => 'required|string|max:255',
-                'birth_date' => 'nullable|date',
+                'birth_date' => 'nullable|date|before:today',
                 'gender' => 'nullable|in:M,F',
                 'marital_status' => 'nullable|string|max:50',
                 'mail' => 'required|email',
-                'mobile_phone' => 'nullable',
-                'landline_phone' => 'nullable',
+                'mobile_phone' => 'nullable|string',
+                'landline_phone' => 'nullable|string',
                 'profession' => 'nullable|string|max:100',
                 'education_level' => 'nullable|string|max:100',
                 'photo' => 'nullable|image|mimes:jpeg,png,jpg,gif|max:2048',
                 'baptism_date' => 'nullable|date',
-                'password' => 'nullable|min:6',
+                'membership_date' => 'nullable|date',
+                'password' => 'nullable|string|min:6',
+                'confirm_password' => 'nullable|same:password',
             ];
 
             $feedback = [
                 'required' => 'O campo :attribute deve ser preenchido',
                 'email' => 'O campo :attribute precisa ser um e-mail válido',
                 'max' => 'O campo :attribute deve ter no máximo :max caracteres',
-                'in' => 'O campo :attribute deve ser M ou F',
+                'in' => 'O campo :attribute deve ser uma opção válida',
                 'date' => 'O campo :attribute deve ser uma data válida',
+                'before' => 'O campo :attribute deve ser uma data anterior a hoje',
                 'image' => 'O campo :attribute deve ser uma imagem',
                 'mimes' => 'O campo :attribute deve ser do tipo: :values',
                 'min' => 'O campo :attribute deve ter no mínimo :min caracteres',
+                'same' => 'O campo :attribute deve ser igual ao campo senha',
             ];
 
             $attributes = [
@@ -510,7 +514,9 @@ class PersonController extends Controller
                 'education_level' => 'escolaridade',
                 'photo' => 'foto',
                 'baptism_date' => 'data de batismo',
+                'membership_date' => 'data de membresia',
                 'password' => 'senha',
+                'confirm_password' => 'confirmação de senha',
             ];
 
             $request->validate($rules, $feedback, $attributes);
