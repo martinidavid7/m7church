@@ -92,6 +92,41 @@
                         class="mt-1 block w-full rounded-md border-gray-300 shadow-sm focus:border-indigo-500 focus:ring-indigo-500 dark:bg-gray-700 dark:border-gray-600 dark:text-white sm:text-sm py-2">
                 </div>
             </div>
+            <div class="grid grid-cols-1 gap-x-6 gap-y-6 sm:grid-cols-6">
+                <div class="sm:col-span-3">
+                    <label for="church_type_id" class="block text-sm font-medium text-gray-700 dark:text-gray-300">{{__('messages.Church Type')}} *</label>
+                    <select name="church_type_id" id="church_type_id"
+                        class="mt-1 block w-full rounded-md border-gray-300 shadow-sm focus:border-indigo-500 focus:ring-indigo-500 dark:bg-gray-700 dark:border-gray-600 dark:text-white sm:text-sm py-2"
+                        required>
+                        <option value="">Selecione o Tipo</option>
+                        @foreach ($churchTypes as $type)
+                            <option value="{{ $type->id }}" {{ old('church_type_id') == $type->id ? 'selected' : '' }}>
+                                {{ $type->church_type }}
+                            </option>
+                        @endforeach
+                    </select>
+                    @error('church_type_id')
+                        <span class="text-red-500 text-sm">{{ $message }}</span>
+                    @enderror
+                </div>
+
+                <div class="sm:col-span-3">
+                    <label for="parent_church_id" class="block text-sm font-medium text-gray-700 dark:text-gray-300">{{__('messages.Parent Church')}}</label>
+                    <select name="parent_church_id" id="parent_church_id"
+                        class="mt-1 block w-full rounded-md border-gray-300 shadow-sm focus:border-indigo-500 focus:ring-indigo-500 dark:bg-gray-700 dark:border-gray-600 dark:text-white sm:text-sm py-2">
+                        <option value="">Nenhuma (Matriz)</option>
+                        @foreach ($churches as $parentChurch)
+                            <option value="{{ $parentChurch->id }}" {{ old('parent_church_id') == $parentChurch->id ? 'selected' : '' }}>
+                                {{ $parentChurch->church_name }}
+                            </option>
+                        @endforeach
+                    </select>
+                    @error('parent_church_id')
+                        <span class="text-red-500 text-sm">{{ $message }}</span>
+                    @enderror
+                </div>
+            </div>
+
             <div>
                 <label for="pastor_id" class="block text-sm font-medium text-gray-700 dark:text-gray-300">Pastor</label>
                 <select name="pastor_id" id="pastor_id"
