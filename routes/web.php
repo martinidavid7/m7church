@@ -28,7 +28,8 @@ Route::middleware(['auth'])->group(function () {
 });
 
 
-Route::middleware(['auth'])->group(function () {
+// Rotas de Church - Apenas Admin e Pastor Presidente
+Route::middleware(['auth', 'role:Admin|Pastor Presidente'])->group(function () {
     Route::prefix('church')->name('church.')->group(function () {
         Route::get('/', [ChurchController::class, 'index'])->name('index');
         Route::get('/create', [ChurchController::class, 'create'])->name('create');
@@ -40,7 +41,14 @@ Route::middleware(['auth'])->group(function () {
 });
 
 
+// Rotas de Person - Perfil próprio (todos os usuários autenticados)
 Route::middleware(['auth'])->group(function () {
+    Route::get('/my-profile', [PersonController::class, 'editMyProfile'])->name('person.my-profile');
+    Route::put('/my-profile/update', [PersonController::class, 'updateMyProfile'])->name('person.update-my-profile');
+});
+
+// Rotas de Person - Admin, Secretaria e Pastores podem gerenciar outros
+Route::middleware(['auth', 'role:Admin|Pastor Presidente|Pastor Auxiliar|Secretaria'])->group(function () {
     Route::prefix('person')->name('person.')->group(function () {
         Route::get('/', [PersonController::class, 'index'])->name('index');
         Route::get('/create', [PersonController::class, 'create'])->name('create');
@@ -50,11 +58,12 @@ Route::middleware(['auth'])->group(function () {
         Route::get('/cities-by-uf/{uf_id}', [PersonController::class, 'getCitiesByUf'])->name('cities-by-uf');
         Route::get('/export', [PersonController::class, 'export'])->name('export');
         Route::get('/print-blank-form', [PersonController::class, 'printBlankForm'])->name('print-blank-form');
+        Route::get('/{id}/print', [PersonController::class, 'print'])->name('print');
     });
-
 });
 
-Route::middleware(['auth'])->group(function () {
+// Rotas de Visitors e Cities - Admin, Secretaria e Pastores
+Route::middleware(['auth', 'role:Admin|Pastor Presidente|Pastor Auxiliar|Secretaria'])->group(function () {
     // Rotas personalizadas de visitantes (antes do resource para terem prioridade)
     Route::get('visitors/export', [VisitorController::class, 'export'])->name('visitors.export');
     Route::get('visitors/print-blank-form', [VisitorController::class, 'printBlankForm'])->name('visitors.print-blank-form');
@@ -64,6 +73,22 @@ Route::middleware(['auth'])->group(function () {
 
     // Rotas CRUD padrão de cidades
     Route::resource('cities', CityController::class);
+});
+
+// Rotas de Impersonate - Apenas Admin
+Route::middleware(['auth', 'role:Admin'])->group(function () {
+    Route::get('/impersonate/take/{user}', function ($userId) {
+        $user = \App\Models\User::findOrFail($userId);
+        auth()->user()->impersonate($user);
+        return redirect()->route('dashboard.index');
+    })->name('impersonate.take');
+});
+
+Route::middleware(['auth'])->group(function () {
+    Route::get('/impersonate/leave', function () {
+        auth()->user()->leaveImpersonation();
+        return redirect()->route('person.index');
+    })->name('impersonate.leave');
 });
 
 
