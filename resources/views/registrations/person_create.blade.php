@@ -301,6 +301,27 @@
                 </div>
             </div>
 
+            <div class="grid grid-cols-1 gap-x-6 gap-y-6 sm:grid-cols-6 mt-6">
+                <div class="sm:col-span-6">
+                    <label class="block text-sm font-medium text-gray-700 dark:text-gray-300">Funções/Cargos</label>
+                    <div class="mt-2 space-y-2">
+                        @foreach ($roles as $role)
+                            <div class="flex items-center">
+                                <input type="checkbox" name="roles[]" id="role_{{ $role->id }}" value="{{ $role->name }}"
+                                    {{ in_array($role->name, old('roles', [])) ? 'checked' : '' }}
+                                    class="h-4 w-4 text-indigo-600 focus:ring-indigo-500 border-gray-300 rounded">
+                                <label for="role_{{ $role->id }}" class="ml-3 text-sm text-gray-700 dark:text-gray-300">
+                                    {{ $role->name }}
+                                </label>
+                            </div>
+                        @endforeach
+                    </div>
+                    @error('roles')
+                        <span class="text-red-500 text-sm">{{ $message }}</span>
+                    @enderror
+                </div>
+            </div>
+
             <div>
                 <button type="submit"
                     class="inline-flex justify-center rounded-md border border-transparent bg-indigo-600 py-2 px-4 text-sm font-medium text-white shadow-sm hover:bg-indigo-700 focus:outline-none focus:ring-2 focus:ring-indigo-500 focus:ring-offset-2">
