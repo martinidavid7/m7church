@@ -8,11 +8,13 @@ use Illuminate\Foundation\Auth\User as Authenticatable;
 use Illuminate\Notifications\Notifiable;
 use Illuminate\Support\Str;
 use Laravel\Sanctum\HasApiTokens;
+use Spatie\Permission\Traits\HasRoles;
+use Lab404\Impersonate\Models\Impersonate;
 
 class User extends Authenticatable
 {
     /** @use HasFactory<\Database\Factories\UserFactory> */
-    use HasApiTokens, HasFactory, Notifiable;
+    use HasApiTokens, HasFactory, Notifiable, HasRoles, Impersonate;
 
     /**
      * The attributes that are mass assignable.
@@ -58,5 +60,23 @@ class User extends Authenticatable
             ->take(2)
             ->map(fn ($word) => Str::substr($word, 0, 1))
             ->implode('');
+    }
+
+    /**
+     * Determina se o usuário pode fazer impersonate de outros
+     * Apenas admins podem impersonate
+     */
+    public function canImpersonate(): bool
+    {
+        return $this->hasRole('Admin');
+    }
+
+    /**
+     * Determina se este usuário pode ser impersonated
+     * Admins não podem ser impersonados
+     */
+    public function canBeImpersonated(): bool
+    {
+        return !$this->hasRole('Admin');
     }
 }
