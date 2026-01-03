@@ -17,7 +17,7 @@ class AdminUserSeeder extends Seeder
     public function run(): void
     {
         // Email do administrador (pode ser alterado via variável de ambiente)
-        $adminEmail = env('ADMIN_EMAIL', '  ');
+        $adminEmail = env('ADMIN_EMAIL', 'admin@m7church.com');
         $adminName = env('ADMIN_NAME', 'Administrador');
         $adminPassword = env('ADMIN_PASSWORD', 'admin123');
 
