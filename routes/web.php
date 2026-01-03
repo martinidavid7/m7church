@@ -10,6 +10,7 @@ use App\Http\Controllers\CityController;
 use App\Http\Controllers\WelcomeController;
 use App\Http\Controllers\VisitorController;
 use App\Models\Visitor;
+use App\Http\Controllers\MinistryController;
 
 Route::get('/', [WelcomeController::class, 'index'])->name('home');
 
@@ -68,6 +69,8 @@ Route::middleware(['auth', 'role:Admin|Pastor Presidente|Pastor Auxiliar|Secreta
     Route::get('visitors/export', [VisitorController::class, 'export'])->name('visitors.export');
     Route::get('visitors/print-blank-form', [VisitorController::class, 'printBlankForm'])->name('visitors.print-blank-form');
 
+    Route::resource('ministries', MinistryController::class);
+
     // Rotas CRUD padrão de visitantes
     Route::resource('visitors', VisitorController::class);
 
@@ -90,6 +93,9 @@ Route::middleware(['auth'])->group(function () {
         return redirect()->route('person.index');
     })->name('impersonate.leave');
 });
+
+
+
 
 
 require __DIR__ . '/auth.php';
