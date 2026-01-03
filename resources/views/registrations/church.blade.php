@@ -20,7 +20,7 @@
                     <label for="logo" class="block text-sm font-medium text-gray-700 dark:text-gray-300">Logo da Igreja</label>
                     @if($church->logo)
                         <div class="mb-2">
-                            <img src="{{ asset('storage/' . $church->logo) }}" alt="Logo atual" class="w-20 h-20 object-contain">
+                            <img src="{{ asset($church->logo) }}" alt="Logo atual" class="w-20 h-20 object-contain">
                             <p class="text-xs text-gray-500 dark:text-gray-400 mt-1">Logo atual</p>
                         </div>
                     @endif

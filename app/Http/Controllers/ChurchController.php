@@ -91,7 +91,10 @@ class ChurchController extends Controller
             // Upload do logo se existir
             $logoPath = null;
             if ($request->hasFile('logo')) {
-                $logoPath = $request->file('logo')->store('churches/logos', 'public');
+                $logo = $request->file('logo');
+                $logoName = time() . '_' . uniqid() . '.' . $logo->getClientOriginalExtension();
+                $logo->move(public_path('uploads/churches/logos'), $logoName);
+                $logoPath = 'uploads/churches/logos/' . $logoName;
             }
 
             // Preparar dados (apenas campos que existem na tabela)
@@ -235,10 +238,13 @@ class ChurchController extends Controller
             // Upload do logo se houver
             if ($request->hasFile('logo')) {
                 // Deletar logo antigo se existir
-                if ($church->logo && \Storage::disk('public')->exists($church->logo)) {
-                    \Storage::disk('public')->delete($church->logo);
+                if ($church->logo && file_exists(public_path($church->logo))) {
+                    unlink(public_path($church->logo));
                 }
-                $churchData['logo'] = $request->file('logo')->store('churches/logos', 'public');
+                $logo = $request->file('logo');
+                $logoName = time() . '_' . uniqid() . '.' . $logo->getClientOriginalExtension();
+                $logo->move(public_path('uploads/churches/logos'), $logoName);
+                $churchData['logo'] = 'uploads/churches/logos/' . $logoName;
             }
 
             $church->update($churchData);

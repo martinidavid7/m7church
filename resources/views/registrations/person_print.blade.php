@@ -185,7 +185,7 @@
     <div class="header">
         <div class="header-logo">
             @if($church && $church->logo)
-                <img src="{{ asset('storage/' . $church->logo) }}" style="max-width: 100%; max-height: 100%;" alt="Logo">
+                <img src="{{ asset($church->logo) }}" style="max-width: 100%; max-height: 100%;" alt="Logo">
             @else
                 LOGO
             @endif
