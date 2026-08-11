@@ -311,7 +311,40 @@
                         <span class="text-red-500 text-sm">{{ $message }}</span>
                     @enderror
                 </div>
+            </div>
 
+            @if ($ministries->isNotEmpty())
+                <div class="grid grid-cols-1 gap-x-6 gap-y-6 sm:grid-cols-6 mt-6">
+                    <div class="sm:col-span-6">
+                        <label class="block text-sm font-medium text-gray-700 dark:text-gray-300">Ministérios</label>
+                        <div class="mt-2 space-y-3">
+                            @foreach ($ministries as $ministry)
+                                @php $currentRole = $personMinistries[$ministry->id] ?? null; @endphp
+                                <div class="flex items-center gap-3">
+                                    <input type="checkbox" name="ministries[]" id="ministry_{{ $ministry->id }}"
+                                        value="{{ $ministry->id }}" {{ $currentRole ? 'checked' : '' }}
+                                        onchange="document.getElementById('ministry_role_{{ $ministry->id }}').disabled = !this.checked"
+                                        class="h-4 w-4 text-indigo-600 focus:ring-indigo-500 border-gray-300 rounded">
+                                    <label for="ministry_{{ $ministry->id }}" class="text-sm text-gray-700 dark:text-gray-300">
+                                        {{ $ministry->name }}
+                                    </label>
+                                    <select name="ministry_role[{{ $ministry->id }}]" id="ministry_role_{{ $ministry->id }}"
+                                        {{ $currentRole ? '' : 'disabled' }}
+                                        class="ml-auto rounded-md border-gray-300 shadow-sm focus:border-indigo-500 focus:ring-indigo-500 dark:bg-gray-700 dark:border-gray-600 dark:text-white text-sm py-1">
+                                        <option value="membro" {{ $currentRole == 'membro' ? 'selected' : '' }}>Membro</option>
+                                        <option value="lider" {{ $currentRole == 'lider' ? 'selected' : '' }}>Líder</option>
+                                    </select>
+                                </div>
+                            @endforeach
+                        </div>
+                        @error('ministries')
+                            <span class="text-red-500 text-sm">{{ $message }}</span>
+                        @enderror
+                    </div>
+                </div>
+            @endif
+
+            <div class="grid grid-cols-1 gap-x-6 gap-y-6 sm:grid-cols-6">
                 <div class="sm:col-span-3">
                     <label for="password"
                         class="block text-sm font-medium text-gray-700 dark:text-gray-300">Nova Senha</label>

@@ -16,19 +16,26 @@ class DashboardController extends Controller
     {
         // Isso fará com que a view 'resources/views/registrations/church.blade.php' seja carregada
 
-        $inactiveMembers = Person::where('active', '0')->count();
-        $totalMembers = Person::all()->count();
+        $totalMembers = Person::count();
         $totalVisitors = Visitor::count();
         $totalPeopleServed = $totalMembers + $totalVisitors;
         $totalServices = Service::count();
 
+        $canViewMemberStats = auth()->user()->hasAnyRole([
+            'Admin', 'Pastor Presidente', 'Pastor Auxiliar', 'Secretaria',
+        ]);
 
-        return view('dashboard', [
-            'inactiveMembers' => $inactiveMembers,
-            'totalMembers' => $totalMembers,
+        $data = [
             'totalPeopleServed' => $totalPeopleServed,
             'totalServices' => $totalServices,
+            'canViewMemberStats' => $canViewMemberStats,
+        ];
 
-        ]);
+        if ($canViewMemberStats) {
+            $data['inactiveMembers'] = Person::where('active', '0')->count();
+            $data['totalMembers'] = $totalMembers;
+        }
+
+        return view('dashboard', $data);
     }
 }

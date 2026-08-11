@@ -76,7 +76,10 @@ Route::middleware(['auth', 'role:Admin|Pastor Presidente|Pastor Auxiliar|Secreta
     Route::get('visitors/export', [VisitorController::class, 'export'])->name('visitors.export');
     Route::get('visitors/print-blank-form', [VisitorController::class, 'printBlankForm'])->name('visitors.print-blank-form');
 
-    Route::resource('ministries', MinistryController::class);
+    // Criação e listagem de ministérios continuam restritas à administração
+    Route::get('ministries', [MinistryController::class, 'index'])->name('ministries.index');
+    Route::get('ministries/create', [MinistryController::class, 'create'])->name('ministries.create');
+    Route::post('ministries', [MinistryController::class, 'store'])->name('ministries.store');
 
     // Rotas CRUD padrão de visitantes
     Route::resource('visitors', VisitorController::class);
@@ -90,6 +93,13 @@ Route::middleware(['auth', 'role:Admin|Pastor Presidente|Pastor Auxiliar|Secreta
     //rotas de servicos (cultos)
     Route::resource('services', ServiceController::class);
 
+});
+
+// Rotas de Ministries - visualização/edição liberada para líderes e membros (controle fino no controller)
+Route::middleware(['auth'])->group(function () {
+    Route::get('ministries/{ministry}', [MinistryController::class, 'show'])->name('ministries.show');
+    Route::get('ministries/{ministry}/edit', [MinistryController::class, 'edit'])->name('ministries.edit');
+    Route::put('ministries/{ministry}', [MinistryController::class, 'update'])->name('ministries.update');
 });
 
 // Rotas de Impersonate - Apenas Admin

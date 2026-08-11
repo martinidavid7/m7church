@@ -89,10 +89,10 @@
                 </div>
             </div>
 
-            <p x-show="sidebarOpen" x-transition
-                class="text-[11px] uppercase tracking-wide text-slate-400 px-2 mt-6 mb-2">{{ __('messages.Church') }}
-            </p>
             @role('Admin|Pastor Presidente')
+                <p x-show="sidebarOpen" x-transition
+                    class="text-[11px] uppercase tracking-wide text-slate-400 px-2 mt-6 mb-2">{{ __('messages.Church') }}
+                </p>
                 <div class="relative group">
                     <a href="{{ route('church.index') }}" :class="sidebarOpen ? 'justify-start' : 'justify-center'"
                         class="flex items-center gap-2 px-3 py-2.5 rounded-lg transition {{ request()->routeIs('church.index') ? 'bg-indigo-50 text-indigo-600' : 'hover:bg-indigo-50 hover:text-indigo-600' }}"
@@ -111,11 +111,42 @@
                 </div>
             @endrole
 
-            <p x-show="sidebarOpen" x-transition
-                class="text-[11px] uppercase tracking-wide text-slate-400 px-2 mt-6 mb-2">{{ __('messages.People') }}
-            </p>
+            @php $myMinistries = auth()->user()->ministries(); @endphp
+            @if ($myMinistries->isNotEmpty())
+                <p x-show="sidebarOpen" x-transition
+                    class="text-[11px] uppercase tracking-wide text-slate-400 px-2 mt-6 mb-2">Meus Ministérios</p>
+
+                @foreach ($myMinistries as $myMinistry)
+                    <div class="relative group">
+                        <a href="{{ route('ministries.show', $myMinistry) }}"
+                            :class="sidebarOpen ? 'justify-start' : 'justify-center'"
+                            class="flex items-center gap-2 px-3 py-2.5 rounded-lg transition overflow-hidden {{ request()->routeIs('ministries.show') && request()->route('ministry')?->id === $myMinistry->id ? 'bg-indigo-50 text-indigo-600' : 'hover:bg-indigo-50 hover:text-indigo-600' }}"
+                            wire:navigate>
+                            <svg class="w-4 h-4 flex-shrink-0" fill="none" stroke="currentColor" stroke-width="1.5"
+                                viewBox="0 0 24 24">
+                                <path stroke-linecap="round" stroke-linejoin="round"
+                                    d="M12 2L2 7v10c0 5.55 3.84 10.74 9 12 5.16-1.26 9-6.45 9-12V7l-10-5z" />
+                            </svg>
+                            <span x-show="sidebarOpen" x-transition class="whitespace-nowrap overflow-hidden text-ellipsis">
+                                {{ $myMinistry->name }}
+                                @if ($myMinistry->pivot->role === 'lider')
+                                    <span class="text-[10px] text-indigo-500">(líder)</span>
+                                @endif
+                            </span>
+                        </a>
+                        <div x-show="!sidebarOpen"
+                            class="absolute left-full ml-2 px-2 py-1 bg-slate-900 text-white text-xs rounded hidden group-hover:block whitespace-nowrap z-50 top-1/2 -translate-y-1/2">
+                            {{ $myMinistry->name }}
+                        </div>
+                    </div>
+                @endforeach
+            @endif
 
             @role('Admin|Pastor Presidente|Pastor Auxiliar|Secretaria')
+                <p x-show="sidebarOpen" x-transition
+                    class="text-[11px] uppercase tracking-wide text-slate-400 px-2 mt-6 mb-2">{{ __('messages.People') }}
+                </p>
+
                 <div class="relative group">
                     <a href="{{ route('person.index', ['active' => 1]) }}"
                         :class="sidebarOpen ? 'justify-start' : 'justify-center'"
@@ -154,10 +185,10 @@
                 </div>
             @endrole
 
-            <p x-show="sidebarOpen" x-transition
-                class="text-[11px] uppercase tracking-wide text-slate-400 px-2 mt-6 mb-2">
-                {{ __('messages.Registration') }}</p>
             @role('Admin')
+                <p x-show="sidebarOpen" x-transition
+                    class="text-[11px] uppercase tracking-wide text-slate-400 px-2 mt-6 mb-2">
+                    {{ __('messages.Registration') }}</p>
                 <div class="relative group">
                     <a href="{{ route('cities.index') }}" :class="sidebarOpen ? 'justify-start' : 'justify-center'"
                         class="flex items-center gap-2 px-3 py-2.5 rounded-lg transition {{ request()->routeIs('cities.index') ? 'bg-indigo-50 text-indigo-600' : 'hover:bg-indigo-50 hover:text-indigo-600' }}"

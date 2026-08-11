@@ -79,4 +79,19 @@ class User extends Authenticatable
     {
         return !$this->hasRole('Admin');
     }
+
+    public function person()
+    {
+        return $this->hasOne(Person::class, 'user_id');
+    }
+
+    /**
+     * Ministérios vinculados à pessoa deste usuário, com o papel (líder/membro).
+     */
+    public function ministries()
+    {
+        return $this->person
+            ? $this->person->ministries()->get()
+            : collect();
+    }
 }
