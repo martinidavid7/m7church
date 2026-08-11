@@ -84,4 +84,19 @@ class Person extends Model
             ->with('relatedPerson')
             ->get();
     }
+
+    public function ministries()
+    {
+        return $this->belongsToMany(Ministry::class, 'person_ministry')
+            ->withPivot('role')
+            ->withTimestamps();
+    }
+
+    public function isLeaderOf(int $ministryId): bool
+    {
+        return $this->ministries()
+            ->wherePivot('role', 'lider')
+            ->where('ministries.id', $ministryId)
+            ->exists();
+    }
 }
