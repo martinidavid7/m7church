@@ -3,22 +3,24 @@
 namespace App\Http\Controllers;
 
 use App\Models\Ministry;
-use App\Models\User;
+use App\Models\Person;
 use Illuminate\Http\Request;
 use Illuminate\View\View;
 use Illuminate\Http\RedirectResponse;
-use Illuminate\Support\Facades\Storage;
+use Symfony\Component\HttpKernel\Exception\AccessDeniedHttpException;
 use Exception;
 
 
 class MinistryController extends Controller
 {
+    private const ADMIN_ROLES = ['Admin', 'Pastor Presidente', 'Pastor Auxiliar', 'Secretaria'];
+
     /**
      * Display a listing of the resource.
      */
     public function index()
     {
-        $ministries = Ministry::with('leader')->paginate(15);
+        $ministries = Ministry::with('leaders')->paginate(15);
         return view('ministries.list', ['ministries' => $ministries]);
     }
 
@@ -27,8 +29,7 @@ class MinistryController extends Controller
      */
     public function create(): View
     {
-        $users = User::orderBy('name')->get();
-        return view('ministries.create', compact('users'));
+        return view('ministries.create');
     }
 
     /**
@@ -39,7 +40,6 @@ class MinistryController extends Controller
         $validated = $request->validate([
             'name' => 'required|string|max:255',
             'description' => 'nullable|string',
-            'leader_id' => 'nullable|exists:users,id',
             'logo' => 'nullable|image|mimes:jpeg,jpg,png|max:2048',
         ]);
 
@@ -61,34 +61,44 @@ class MinistryController extends Controller
     }
 
     /**
-     * Display the specified resource.
+     * Display the specified resource. Acessível à administração, líderes e membros do ministério.
      */
-    public function show(Ministry $ministry)
+    public function show(Ministry $ministry): View
     {
-        //
+        $person = $this->currentPerson();
+
+        $isLeader = $person && $person->isLeaderOf($ministry->id);
+        $isMember = $person && $person->ministries()->where('ministries.id', $ministry->id)->exists();
+
+        if (!auth()->user()->hasAnyRole(self::ADMIN_ROLES) && !$isLeader && !$isMember) {
+            throw new AccessDeniedHttpException('Você não tem acesso a este ministério.');
+        }
+
+        $ministry->load(['leaders', 'members']);
+
+        return view('ministries.show', compact('ministry', 'isLeader'));
     }
 
     /**
-     * Show the form for editing the specified resource.
+     * Show the form for editing the specified resource. Líderes podem editar seu próprio ministério.
      */
-    public function edit($id): View
+    public function edit(Ministry $ministry): View
     {
-        $ministry = Ministry::findOrFail($id);
-        $users = User::orderBy('name')->get();
-        return view('ministries.edit', compact('ministry', 'users'));
+        $this->authorizeManage($ministry);
+
+        return view('ministries.edit', compact('ministry'));
     }
 
     /**
      * Update the specified resource in storage.
      */
-    public function update(Request $request, $id): RedirectResponse
+    public function update(Request $request, Ministry $ministry): RedirectResponse
     {
-        $ministry = Ministry::findOrFail($id);
+        $this->authorizeManage($ministry);
 
         $validated = $request->validate([
             'name' => 'required|string|max:255',
             'description' => 'nullable|string',
-            'leader_id' => 'nullable|exists:users,id',
             'logo' => 'nullable|image|mimes:jpeg,jpg,png|max:2048',
         ]);
 
@@ -120,5 +130,25 @@ class MinistryController extends Controller
     public function destroy(Ministry $ministry)
     {
         //
+    }
+
+    private function currentPerson(): ?Person
+    {
+        return Person::where('user_id', auth()->id())->first();
+    }
+
+    private function authorizeManage(Ministry $ministry): void
+    {
+        if (auth()->user()->hasAnyRole(self::ADMIN_ROLES)) {
+            return;
+        }
+
+        $person = $this->currentPerson();
+
+        if ($person && $person->isLeaderOf($ministry->id)) {
+            return;
+        }
+
+        throw new AccessDeniedHttpException('Você não tem permissão para editar este ministério.');
     }
 }
