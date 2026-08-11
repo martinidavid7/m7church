@@ -91,25 +91,27 @@
         <!-- Indicadores -->
         <div class="grid grid-cols-3 gap-6 max-w-md mx-auto">
             <div class="bg-white rounded-xl px-4 py-4 shadow-sm">
-                <div class="text-xl font-bold text-indigo-600">+{{ $activeMembers }}</div>
+                <div class="text-xl font-bold text-indigo-600">+ {{ $totalPeopleServed }}</div>
                 <div class="text-[12px] text-slate-500 uppercase tracking-wide">
-                    Membros ativos
+                    Pessoas atendidas
                 </div>
             </div>
 
-            <div class="bg-white rounded-xl px-4 py-4 shadow-sm">
-                <div class="text-xl font-bold text-indigo-600">08</div>
+            <a href="{{ route('public.ministries') }}"
+                class="bg-white rounded-xl px-4 py-4 shadow-sm hover:shadow-md hover:-translate-y-0.5 transition">
+                <div class="text-xl font-bold text-indigo-600">+ {{$ministries }}</div>
                 <div class="text-[12px] text-slate-500 uppercase tracking-wide">
-                    Ministérios
+                    Ministérios para voce servir
                 </div>
-            </div>
+            </a>
 
-            <div class="bg-white rounded-xl px-4 py-4 shadow-sm">
-                <div class="text-xl font-bold text-indigo-600">03</div>
+            <a href="{{ route('public.services') }}"
+                class="bg-white rounded-xl px-4 py-4 shadow-sm hover:shadow-md hover:-translate-y-0.5 transition">
+                <div class="text-xl font-bold text-indigo-600">{{ $totalServices }}</div>
                 <div class="text-[12px] text-slate-500 uppercase tracking-wide">
-                    Cultos semanais
+                    Reuniões semanais
                 </div>
-            </div>
+            </a>
         </div>
 
     </main>
