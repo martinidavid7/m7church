@@ -23,12 +23,18 @@
                 </div>
             </div>
 
-            @if ($isLeader)
-                <a href="{{ route('ministries.edit', $ministry) }}"
-                    class="inline-flex items-center px-4 py-2 bg-indigo-600 border border-transparent rounded-md font-semibold text-xs text-white uppercase tracking-widest hover:bg-indigo-700 transition">
-                    {{ __('messages.Edit') }}
+            <div class="flex gap-2">
+                <a href="{{ route('ministries.schedules.index', $ministry) }}"
+                    class="inline-flex items-center px-4 py-2 bg-white dark:bg-gray-700 border border-gray-300 dark:border-gray-600 rounded-md font-semibold text-xs text-gray-700 dark:text-gray-300 uppercase tracking-widest hover:bg-gray-50 dark:hover:bg-gray-600 transition">
+                    Escalas
                 </a>
-            @endif
+                @if ($isLeader)
+                    <a href="{{ route('ministries.edit', $ministry) }}"
+                        class="inline-flex items-center px-4 py-2 bg-indigo-600 border border-transparent rounded-md font-semibold text-xs text-white uppercase tracking-widest hover:bg-indigo-700 transition">
+                        {{ __('messages.Edit') }}
+                    </a>
+                @endif
+            </div>
         </div>
 
         @if ($ministry->description)
