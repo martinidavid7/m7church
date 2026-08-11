@@ -4,11 +4,13 @@
         <h1 class="text-2xl font-bold mb-8">{{ __('messages.Dashboard') }}</h1>
 
         <!-- Cards Estatísticos -->
-        <div class="grid grid-cols-1 md:grid-cols-3 gap-6 mb-10">
+        <div class="grid grid-cols-1 md:grid-cols-4 gap-6 mb-10">
 
             <div class="bg-white shadow-sm border rounded-xl p-6 text-center">
-                <h2 class="text-sm text-slate-500 mb-2">{{ __('messages.Active Members') }}</h2>
-                <p class="text-3xl font-bold text-indigo-600">{{ $activeMembers }}</p>
+                <h2 class="text-sm text-slate-500 mb-2">{{ __('messages.People Served') }}</h2>
+                <p class="text-lg font-semibold text-indigo-600">
+                    {{ __('messages.We Have Served More Than', ['count' => $totalPeopleServed]) }}
+                </p>
             </div>
 
             <div class="bg-white shadow-sm border rounded-xl p-6 text-center">
@@ -19,6 +21,11 @@
             <div class="bg-white shadow-sm border rounded-xl p-6 text-center">
                 <h2 class="text-sm text-slate-500 mb-2">{{ __('messages.Total Members') }}</h2>
                 <p class="text-3xl font-bold text-indigo-600">{{ $totalMembers }}</p>
+            </div>
+
+            <div class="bg-white shadow-sm border rounded-xl p-6 text-center">
+                <h2 class="text-sm text-slate-500 mb-2">{{ __('messages.Services') }}</h2>
+                <p class="text-3xl font-bold text-indigo-600">{{ $totalServices }}</p>
             </div>
 
         </div>

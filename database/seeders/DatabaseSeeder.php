@@ -8,6 +8,7 @@ use Database\Seeders\CitiesSeeder;
 use Database\Seeders\RoleSeeder;
 use Database\Seeders\ChurchTypeSeeder;
 use Database\Seeders\AdminUserSeeder;
+use Database\Seeders\ServiceTypeSeeder;
 
 
 
@@ -34,6 +35,7 @@ class DatabaseSeeder extends Seeder
         $this->call(UfSeeder::class);
         $this->call(CitiesSeeder::class);
         $this->call(RoleSeeder::class);
+        $this->call(ServiceTypeSeeder::class);
 
     }
 }
