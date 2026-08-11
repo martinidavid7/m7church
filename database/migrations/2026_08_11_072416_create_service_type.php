@@ -11,18 +11,11 @@ return new class extends Migration
      */
     public function up(): void
     {
-        Schema::create('ministries', function (Blueprint $table) {
+        Schema::create('service_type', function (Blueprint $table) {
             $table->id();
-            $table->string('name');
-            $table->string('description')->nullable();
-            $table->string('logo')->nullable();
-            $table->unsignedBigInteger('leader_id');
+            $table->string('service_type');
             $table->timestamps();
-
-            $table->foreign('leader_id')->references('id')->on('users');
         });
-
-
     }
 
     /**
@@ -30,6 +23,6 @@ return new class extends Migration
      */
     public function down(): void
     {
-        Schema::dropIfExists('ministries');
+        Schema::dropIfExists('service_type');
     }
 };
