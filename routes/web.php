@@ -11,8 +11,15 @@ use App\Http\Controllers\WelcomeController;
 use App\Http\Controllers\VisitorController;
 use App\Models\Visitor;
 use App\Http\Controllers\MinistryController;
+use App\Http\Controllers\ServiceController;
+use App\Http\Controllers\ServiceTypeController;
+use App\Http\Controllers\PublicController;
 
 Route::get('/', [WelcomeController::class, 'index'])->name('home');
+
+// Páginas públicas - visíveis sem autenticação
+Route::get('/reunioes', [PublicController::class, 'services'])->name('public.services');
+Route::get('/ministerios', [PublicController::class, 'ministries'])->name('public.ministries');
 
 Route::middleware(['auth'])->group(function () {
     Route::prefix('dashboard')->name('dashboard.')->group(function () {
@@ -76,6 +83,13 @@ Route::middleware(['auth', 'role:Admin|Pastor Presidente|Pastor Auxiliar|Secreta
 
     // Rotas CRUD padrão de cidades
     Route::resource('cities', CityController::class);
+
+    //rotas de tipos de servicos
+    Route::resource('service_type', ServiceTypeController::class);
+
+    //rotas de servicos (cultos)
+    Route::resource('services', ServiceController::class);
+
 });
 
 // Rotas de Impersonate - Apenas Admin
