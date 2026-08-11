@@ -36,4 +36,9 @@ class Service extends Model
 
         return $options;
     }
+
+    public function schedules()
+    {
+        return $this->hasMany(Schedule::class);
+    }
 }
