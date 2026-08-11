@@ -3,7 +3,6 @@
 namespace App\Models;
 
 use Illuminate\Database\Eloquent\Model;
-use App\Models\User;
 
 class Ministry extends Model
 {
@@ -13,11 +12,22 @@ class Ministry extends Model
         'name',
         'description',
         'logo',
-        'leader_id'
     ];
 
-    public function leader(){
-        return $this->belongsTo(User::class, 'leader_id');
+    public function people()
+    {
+        return $this->belongsToMany(Person::class, 'person_ministry')
+            ->withPivot('role')
+            ->withTimestamps();
     }
 
+    public function leaders()
+    {
+        return $this->people()->wherePivot('role', 'lider');
+    }
+
+    public function members()
+    {
+        return $this->people()->wherePivot('role', 'membro');
+    }
 }
