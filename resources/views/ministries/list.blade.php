@@ -59,15 +59,10 @@
                                 </div>
                             </td>
                             <td class="px-6 py-4 whitespace-nowrap">
-                                @if ($ministry->leader)
+                                @if ($ministry->leaders->isNotEmpty())
                                     <div class="text-sm text-gray-900 dark:text-white">
-                                        {{ $ministry->leader->name }}
+                                        {{ $ministry->leaders->pluck('name')->join(', ') }}
                                     </div>
-                                    @if ($ministry->leader->email)
-                                        <div class="text-sm text-gray-500 dark:text-gray-400">
-                                            {{ $ministry->leader->email }}
-                                        </div>
-                                    @endif
                                 @else
                                     <span class="text-sm text-gray-400 dark:text-gray-500">
                                         Sem líder
@@ -81,6 +76,10 @@
                             </td>
                             <td class="px-6 py-4 whitespace-nowrap text-right text-sm font-medium">
                                 <div class="flex items-center justify-end gap-3">
+                                    <a href="{{ route('ministries.show', $ministry) }}"
+                                        class="text-gray-600 hover:text-gray-900 dark:text-gray-400 dark:hover:text-gray-300 transition-colors duration-150">
+                                        Visualizar
+                                    </a>
                                     <a href="{{ route('ministries.edit', ['ministry' => $ministry->id]) }}"
                                         class="text-indigo-600 hover:text-indigo-900 dark:text-indigo-400 dark:hover:text-indigo-300 transition-colors duration-150">
                                         Editar

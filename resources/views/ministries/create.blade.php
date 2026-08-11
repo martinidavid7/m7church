@@ -22,24 +22,11 @@
                         <span class="text-red-500 text-sm">{{ $message }}</span>
                     @enderror
                 </div>
-
-                <div class="sm:col-span-2">
-                    <label for="leader_id"
-                        class="block text-sm font-medium text-gray-700 dark:text-gray-300">Líder do Ministério</label>
-                    <select name="leader_id" id="leader_id"
-                        class="mt-1 block w-full rounded-md border-gray-300 shadow-sm focus:border-indigo-500 focus:ring-indigo-500 dark:bg-gray-700 dark:border-gray-600 dark:text-white sm:text-sm py-2">
-                        <option value="">Selecione um líder</option>
-                        @foreach ($users as $user)
-                            <option value="{{ $user->id }}" {{ old('leader_id') == $user->id ? 'selected' : '' }}>
-                                {{ $user->name }}
-                            </option>
-                        @endforeach
-                    </select>
-                    @error('leader_id')
-                        <span class="text-red-500 text-sm">{{ $message }}</span>
-                    @enderror
-                </div>
             </div>
+
+            <p class="text-sm text-gray-500 dark:text-gray-400">
+                Líderes e membros do ministério são definidos no cadastro de cada pessoa.
+            </p>
 
             <div class="grid grid-cols-1 gap-x-6 gap-y-6 sm:grid-cols-6">
                 <div class="sm:col-span-6">
