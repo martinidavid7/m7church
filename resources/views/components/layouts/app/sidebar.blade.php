@@ -89,10 +89,10 @@
                 </div>
             </div>
 
-            <p x-show="sidebarOpen" x-transition
-                class="text-[11px] uppercase tracking-wide text-slate-400 px-2 mt-6 mb-2">{{ __('messages.Church') }}
-            </p>
             @role('Admin|Pastor Presidente')
+                <p x-show="sidebarOpen" x-transition
+                    class="text-[11px] uppercase tracking-wide text-slate-400 px-2 mt-6 mb-2">{{ __('messages.Church') }}
+                </p>
                 <div class="relative group">
                     <a href="{{ route('church.index') }}" :class="sidebarOpen ? 'justify-start' : 'justify-center'"
                         class="flex items-center gap-2 px-3 py-2.5 rounded-lg transition {{ request()->routeIs('church.index') ? 'bg-indigo-50 text-indigo-600' : 'hover:bg-indigo-50 hover:text-indigo-600' }}"
@@ -111,11 +111,11 @@
                 </div>
             @endrole
 
-            <p x-show="sidebarOpen" x-transition
-                class="text-[11px] uppercase tracking-wide text-slate-400 px-2 mt-6 mb-2">{{ __('messages.People') }}
-            </p>
-
             @role('Admin|Pastor Presidente|Pastor Auxiliar|Secretaria')
+                <p x-show="sidebarOpen" x-transition
+                    class="text-[11px] uppercase tracking-wide text-slate-400 px-2 mt-6 mb-2">{{ __('messages.People') }}
+                </p>
+
                 <div class="relative group">
                     <a href="{{ route('person.index', ['active' => 1]) }}"
                         :class="sidebarOpen ? 'justify-start' : 'justify-center'"
@@ -154,10 +154,10 @@
                 </div>
             @endrole
 
-            <p x-show="sidebarOpen" x-transition
-                class="text-[11px] uppercase tracking-wide text-slate-400 px-2 mt-6 mb-2">
-                {{ __('messages.Registration') }}</p>
             @role('Admin')
+                <p x-show="sidebarOpen" x-transition
+                    class="text-[11px] uppercase tracking-wide text-slate-400 px-2 mt-6 mb-2">
+                    {{ __('messages.Registration') }}</p>
                 <div class="relative group">
                     <a href="{{ route('cities.index') }}" :class="sidebarOpen ? 'justify-start' : 'justify-center'"
                         class="flex items-center gap-2 px-3 py-2.5 rounded-lg transition {{ request()->routeIs('cities.index') ? 'bg-indigo-50 text-indigo-600' : 'hover:bg-indigo-50 hover:text-indigo-600' }}"
