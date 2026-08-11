@@ -7,6 +7,7 @@ use App\Models\Person;
 use App\Models\City;
 use App\Models\UF;
 use App\Models\Church;
+use App\Models\Ministry;
 use Illuminate\View\View;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Hash;
@@ -56,7 +57,14 @@ class PersonController extends Controller
         $uf = UF::all();
         $churches = Church::orderBy('church_name')->get();
         $roles = \Spatie\Permission\Models\Role::all();
-        return view('registrations.person_create', ['uf' => $uf, 'cities' => $cities, 'churches' => $churches, 'roles' => $roles]);
+        $ministries = Ministry::orderBy('name')->get();
+        return view('registrations.person_create', [
+            'uf' => $uf,
+            'cities' => $cities,
+            'churches' => $churches,
+            'roles' => $roles,
+            'ministries' => $ministries,
+        ]);
     }
 
 
@@ -194,6 +202,9 @@ class PersonController extends Controller
                 $user->syncRoles($request->roles);
             }
 
+            // 5. Associar ministérios (líder/membro)
+            $this->syncPersonMinistries($person, $request);
+
             DB::commit();
             \Log::info('Cadastro de pessoa concluído com sucesso');
 
@@ -249,6 +260,7 @@ class PersonController extends Controller
             $uf = UF::all();
             $churches = Church::orderBy('church_name')->get();
             $roles = \Spatie\Permission\Models\Role::all();
+            $ministries = Ministry::orderBy('name')->get();
 
             // Verificar se a pessoa tem user_id e buscar roles (usando Spatie)
             $personRoles = [];
@@ -259,13 +271,18 @@ class PersonController extends Controller
                 }
             }
 
+            // Ministérios já vinculados: [ministry_id => role]
+            $personMinistries = $person->ministries()->pluck('person_ministry.role', 'ministries.id')->toArray();
+
             return view('registrations.person', [
                 'person' => $person,
                 'cities' => $cities,
                 'uf' => $uf,
                 'churches' => $churches,
                 'roles' => $roles,
-                'personRoles' => $personRoles
+                'personRoles' => $personRoles,
+                'ministries' => $ministries,
+                'personMinistries' => $personMinistries,
             ]);
         } catch (Exception $e) {
 
@@ -393,6 +410,8 @@ class PersonController extends Controller
                     }
                 }
             }
+
+            $this->syncPersonMinistries($person, $request);
 
             return redirect()->route('person.index')->with('success', 'Dados atualizados com sucesso!');
         } catch (\Exception $e) {
@@ -616,5 +635,23 @@ class PersonController extends Controller
         }
 
         return view('registrations.person_print', compact('person', 'rolesString'));
+    }
+
+    /**
+     * Sincroniza os vínculos de ministério (líder/membro) de uma pessoa
+     * a partir dos campos "ministries[]" e "ministry_role[id]" do formulário.
+     */
+    private function syncPersonMinistries(Person $person, Request $request): void
+    {
+        $selectedIds = $request->input('ministries', []);
+        $rolesById = $request->input('ministry_role', []);
+
+        $sync = [];
+        foreach ($selectedIds as $ministryId) {
+            $role = $rolesById[$ministryId] ?? 'membro';
+            $sync[$ministryId] = ['role' => $role === 'lider' ? 'lider' : 'membro'];
+        }
+
+        $person->ministries()->sync($sync);
     }
 }
