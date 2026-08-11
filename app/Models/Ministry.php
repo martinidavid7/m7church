@@ -17,7 +17,7 @@ class Ministry extends Model
     public function people()
     {
         return $this->belongsToMany(Person::class, 'person_ministry')
-            ->withPivot('role')
+            ->withPivot('role', 'function')
             ->withTimestamps();
     }
 
@@ -29,5 +29,10 @@ class Ministry extends Model
     public function members()
     {
         return $this->people()->wherePivot('role', 'membro');
+    }
+
+    public function schedules()
+    {
+        return $this->hasMany(Schedule::class);
     }
 }

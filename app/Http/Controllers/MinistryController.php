@@ -2,18 +2,17 @@
 
 namespace App\Http\Controllers;
 
+use App\Http\Controllers\Concerns\AuthorizesMinistryAccess;
 use App\Models\Ministry;
-use App\Models\Person;
 use Illuminate\Http\Request;
 use Illuminate\View\View;
 use Illuminate\Http\RedirectResponse;
-use Symfony\Component\HttpKernel\Exception\AccessDeniedHttpException;
 use Exception;
 
 
 class MinistryController extends Controller
 {
-    private const ADMIN_ROLES = ['Admin', 'Pastor Presidente', 'Pastor Auxiliar', 'Secretaria'];
+    use AuthorizesMinistryAccess;
 
     /**
      * Display a listing of the resource.
@@ -65,18 +64,12 @@ class MinistryController extends Controller
      */
     public function show(Ministry $ministry): View
     {
-        $person = $this->currentPerson();
-
-        $isLeader = $person && $person->isLeaderOf($ministry->id);
-        $isMember = $person && $person->ministries()->where('ministries.id', $ministry->id)->exists();
-
-        if (!auth()->user()->hasAnyRole(self::ADMIN_ROLES) && !$isLeader && !$isMember) {
-            throw new AccessDeniedHttpException('Você não tem acesso a este ministério.');
-        }
+        $this->authorizeMinistryView($ministry);
 
         $ministry->load(['leaders', 'members']);
+        $canManage = $this->isMinistryAdmin() || $this->isMinistryLeader($ministry);
 
-        return view('ministries.show', compact('ministry', 'isLeader'));
+        return view('ministries.show', ['ministry' => $ministry, 'isLeader' => $canManage]);
     }
 
     /**
@@ -84,7 +77,7 @@ class MinistryController extends Controller
      */
     public function edit(Ministry $ministry): View
     {
-        $this->authorizeManage($ministry);
+        $this->authorizeMinistryManage($ministry);
 
         return view('ministries.edit', compact('ministry'));
     }
@@ -94,7 +87,7 @@ class MinistryController extends Controller
      */
     public function update(Request $request, Ministry $ministry): RedirectResponse
     {
-        $this->authorizeManage($ministry);
+        $this->authorizeMinistryManage($ministry);
 
         $validated = $request->validate([
             'name' => 'required|string|max:255',
@@ -130,25 +123,5 @@ class MinistryController extends Controller
     public function destroy(Ministry $ministry)
     {
         //
-    }
-
-    private function currentPerson(): ?Person
-    {
-        return Person::where('user_id', auth()->id())->first();
-    }
-
-    private function authorizeManage(Ministry $ministry): void
-    {
-        if (auth()->user()->hasAnyRole(self::ADMIN_ROLES)) {
-            return;
-        }
-
-        $person = $this->currentPerson();
-
-        if ($person && $person->isLeaderOf($ministry->id)) {
-            return;
-        }
-
-        throw new AccessDeniedHttpException('Você não tem permissão para editar este ministério.');
     }
 }

@@ -384,17 +384,21 @@
                                 <div class="flex items-center gap-3">
                                     <input type="checkbox" name="ministries[]" id="ministry_{{ $ministry->id }}"
                                         value="{{ $ministry->id }}" {{ $checked ? 'checked' : '' }}
-                                        onchange="document.getElementById('ministry_role_{{ $ministry->id }}').disabled = !this.checked"
+                                        onchange="document.getElementById('ministry_role_{{ $ministry->id }}').disabled = document.getElementById('ministry_function_{{ $ministry->id }}').disabled = !this.checked"
                                         class="h-4 w-4 text-indigo-600 focus:ring-indigo-500 border-gray-300 rounded">
-                                    <label for="ministry_{{ $ministry->id }}" class="text-sm text-gray-700 dark:text-gray-300">
+                                    <label for="ministry_{{ $ministry->id }}" class="text-sm text-gray-700 dark:text-gray-300 w-40 truncate">
                                         {{ $ministry->name }}
                                     </label>
                                     <select name="ministry_role[{{ $ministry->id }}]" id="ministry_role_{{ $ministry->id }}"
                                         {{ $checked ? '' : 'disabled' }}
-                                        class="ml-auto rounded-md border-gray-300 shadow-sm focus:border-indigo-500 focus:ring-indigo-500 dark:bg-gray-700 dark:border-gray-600 dark:text-white text-sm py-1">
+                                        class="rounded-md border-gray-300 shadow-sm focus:border-indigo-500 focus:ring-indigo-500 dark:bg-gray-700 dark:border-gray-600 dark:text-white text-sm py-1">
                                         <option value="membro" {{ old("ministry_role.{$ministry->id}") == 'membro' ? 'selected' : '' }}>Membro</option>
                                         <option value="lider" {{ old("ministry_role.{$ministry->id}") == 'lider' ? 'selected' : '' }}>Líder</option>
                                     </select>
+                                    <input type="text" name="ministry_function[{{ $ministry->id }}]" id="ministry_function_{{ $ministry->id }}"
+                                        value="{{ old("ministry_function.{$ministry->id}") }}" placeholder="Função (ex: Violão, Voz, Limpeza)"
+                                        {{ $checked ? '' : 'disabled' }}
+                                        class="flex-1 rounded-md border-gray-300 shadow-sm focus:border-indigo-500 focus:ring-indigo-500 dark:bg-gray-700 dark:border-gray-600 dark:text-white text-sm py-1">
                                 </div>
                             @endforeach
                         </div>

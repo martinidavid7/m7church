@@ -88,7 +88,7 @@ class Person extends Model
     public function ministries()
     {
         return $this->belongsToMany(Ministry::class, 'person_ministry')
-            ->withPivot('role')
+            ->withPivot('role', 'function')
             ->withTimestamps();
     }
 
@@ -98,5 +98,12 @@ class Person extends Model
             ->wherePivot('role', 'lider')
             ->where('ministries.id', $ministryId)
             ->exists();
+    }
+
+    public function schedules()
+    {
+        return $this->belongsToMany(Schedule::class, 'schedule_assignments')
+            ->withPivot('function')
+            ->withTimestamps();
     }
 }

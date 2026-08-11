@@ -271,8 +271,15 @@ class PersonController extends Controller
                 }
             }
 
-            // Ministérios já vinculados: [ministry_id => role]
-            $personMinistries = $person->ministries()->pluck('person_ministry.role', 'ministries.id')->toArray();
+            // Ministérios já vinculados: [ministry_id => ['role' => ..., 'function' => ...]]
+            $personMinistries = $person->ministries()->get()
+                ->mapWithKeys(fn ($ministry) => [
+                    $ministry->id => [
+                        'role' => $ministry->pivot->role,
+                        'function' => $ministry->pivot->function,
+                    ],
+                ])
+                ->toArray();
 
             return view('registrations.person', [
                 'person' => $person,
@@ -645,11 +652,15 @@ class PersonController extends Controller
     {
         $selectedIds = $request->input('ministries', []);
         $rolesById = $request->input('ministry_role', []);
+        $functionsById = $request->input('ministry_function', []);
 
         $sync = [];
         foreach ($selectedIds as $ministryId) {
             $role = $rolesById[$ministryId] ?? 'membro';
-            $sync[$ministryId] = ['role' => $role === 'lider' ? 'lider' : 'membro'];
+            $sync[$ministryId] = [
+                'role' => $role === 'lider' ? 'lider' : 'membro',
+                'function' => $functionsById[$ministryId] ?? null,
+            ];
         }
 
         $person->ministries()->sync($sync);

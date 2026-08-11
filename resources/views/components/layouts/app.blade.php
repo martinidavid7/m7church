@@ -69,6 +69,42 @@
             });
         @endif
     });
+
+    window.confirmDeleteSchedule = function (scheduleId, serviceName, wire) {
+        Swal.fire({
+            icon: 'warning',
+            title: 'Excluir escala?',
+            html: `A escala de <strong>${serviceName}</strong> e todos os escalados nela serão removidos.`,
+            showCancelButton: true,
+            confirmButtonText: 'Excluir',
+            cancelButtonText: 'Cancelar',
+            confirmButtonColor: '#dc2626',
+            cancelButtonColor: '#6b7280',
+            reverseButtons: true,
+        }).then((result) => {
+            if (result.isConfirmed) {
+                wire.deleteSchedule(scheduleId);
+            }
+        });
+    };
+
+    window.confirmRemovePerson = function (scheduleId, personId, personName, wire) {
+        Swal.fire({
+            icon: 'question',
+            title: 'Remover pessoa da escala?',
+            html: `<strong>${personName}</strong> será removido(a) desta escala.`,
+            showCancelButton: true,
+            confirmButtonText: 'Remover',
+            cancelButtonText: 'Cancelar',
+            confirmButtonColor: '#dc2626',
+            cancelButtonColor: '#6b7280',
+            reverseButtons: true,
+        }).then((result) => {
+            if (result.isConfirmed) {
+                wire.removePerson(scheduleId, personId);
+            }
+        });
+    };
 </script>
 
 @livewireScripts

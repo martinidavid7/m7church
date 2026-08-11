@@ -319,21 +319,29 @@
                         <label class="block text-sm font-medium text-gray-700 dark:text-gray-300">Ministérios</label>
                         <div class="mt-2 space-y-3">
                             @foreach ($ministries as $ministry)
-                                @php $currentRole = $personMinistries[$ministry->id] ?? null; @endphp
+                                @php
+                                    $currentLink = $personMinistries[$ministry->id] ?? null;
+                                    $currentRole = $currentLink['role'] ?? null;
+                                    $currentFunction = $currentLink['function'] ?? null;
+                                @endphp
                                 <div class="flex items-center gap-3">
                                     <input type="checkbox" name="ministries[]" id="ministry_{{ $ministry->id }}"
                                         value="{{ $ministry->id }}" {{ $currentRole ? 'checked' : '' }}
-                                        onchange="document.getElementById('ministry_role_{{ $ministry->id }}').disabled = !this.checked"
+                                        onchange="document.getElementById('ministry_role_{{ $ministry->id }}').disabled = document.getElementById('ministry_function_{{ $ministry->id }}').disabled = !this.checked"
                                         class="h-4 w-4 text-indigo-600 focus:ring-indigo-500 border-gray-300 rounded">
-                                    <label for="ministry_{{ $ministry->id }}" class="text-sm text-gray-700 dark:text-gray-300">
+                                    <label for="ministry_{{ $ministry->id }}" class="text-sm text-gray-700 dark:text-gray-300 w-40 truncate">
                                         {{ $ministry->name }}
                                     </label>
                                     <select name="ministry_role[{{ $ministry->id }}]" id="ministry_role_{{ $ministry->id }}"
                                         {{ $currentRole ? '' : 'disabled' }}
-                                        class="ml-auto rounded-md border-gray-300 shadow-sm focus:border-indigo-500 focus:ring-indigo-500 dark:bg-gray-700 dark:border-gray-600 dark:text-white text-sm py-1">
+                                        class="rounded-md border-gray-300 shadow-sm focus:border-indigo-500 focus:ring-indigo-500 dark:bg-gray-700 dark:border-gray-600 dark:text-white text-sm py-1">
                                         <option value="membro" {{ $currentRole == 'membro' ? 'selected' : '' }}>Membro</option>
                                         <option value="lider" {{ $currentRole == 'lider' ? 'selected' : '' }}>Líder</option>
                                     </select>
+                                    <input type="text" name="ministry_function[{{ $ministry->id }}]" id="ministry_function_{{ $ministry->id }}"
+                                        value="{{ $currentFunction }}" placeholder="Função (ex: Violão, Voz, Limpeza)"
+                                        {{ $currentRole ? '' : 'disabled' }}
+                                        class="flex-1 rounded-md border-gray-300 shadow-sm focus:border-indigo-500 focus:ring-indigo-500 dark:bg-gray-700 dark:border-gray-600 dark:text-white text-sm py-1">
                                 </div>
                             @endforeach
                         </div>
