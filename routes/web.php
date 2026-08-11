@@ -14,6 +14,7 @@ use App\Http\Controllers\MinistryController;
 use App\Http\Controllers\ServiceController;
 use App\Http\Controllers\ServiceTypeController;
 use App\Http\Controllers\PublicController;
+use App\Http\Controllers\ScheduleController;
 
 Route::get('/', [WelcomeController::class, 'index'])->name('home');
 
@@ -100,6 +101,16 @@ Route::middleware(['auth'])->group(function () {
     Route::get('ministries/{ministry}', [MinistryController::class, 'show'])->name('ministries.show');
     Route::get('ministries/{ministry}/edit', [MinistryController::class, 'edit'])->name('ministries.edit');
     Route::put('ministries/{ministry}', [MinistryController::class, 'update'])->name('ministries.update');
+
+    // Escalas do ministério - líderes e administração (controle fino no controller)
+    Route::prefix('ministries/{ministry}/schedules')->name('ministries.schedules.')->group(function () {
+        Route::get('/', [ScheduleController::class, 'index'])->name('index');
+        Route::get('/create', [ScheduleController::class, 'create'])->name('create');
+        Route::post('/', [ScheduleController::class, 'store'])->name('store');
+        Route::get('/{schedule}/edit', [ScheduleController::class, 'edit'])->name('edit');
+        Route::put('/{schedule}', [ScheduleController::class, 'update'])->name('update');
+        Route::delete('/{schedule}', [ScheduleController::class, 'destroy'])->name('destroy');
+    });
 });
 
 // Rotas de Impersonate - Apenas Admin
