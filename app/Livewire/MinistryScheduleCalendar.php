@@ -3,6 +3,7 @@
 namespace App\Livewire;
 
 use App\Models\Ministry;
+use App\Models\Person;
 use App\Models\Schedule;
 use Illuminate\Support\Carbon;
 use Livewire\Component;
@@ -13,10 +14,13 @@ class MinistryScheduleCalendar extends Component
     public bool $isLeader;
     public int $month;
     public int $year;
+    public ?int $currentPersonId = null;
 
     public ?int $addingToScheduleId = null;
     public string $newPersonId = '';
     public string $newPersonFunction = '';
+
+    public ?int $openScheduleId = null;
 
     public function mount(Ministry $ministry, bool $isLeader): void
     {
@@ -26,6 +30,17 @@ class MinistryScheduleCalendar extends Component
         $this->isLeader = $isLeader;
         $this->month = (int) now()->month;
         $this->year = (int) now()->year;
+        $this->currentPersonId = Person::where('user_id', auth()->id())->value('id');
+    }
+
+    public function openSchedule(int $scheduleId): void
+    {
+        $this->openScheduleId = $scheduleId;
+    }
+
+    public function closeSchedule(): void
+    {
+        $this->openScheduleId = null;
     }
 
     public function previousMonth(): void
@@ -106,6 +121,10 @@ class MinistryScheduleCalendar extends Component
         }
 
         Schedule::where('ministry_id', $this->ministry->id)->findOrFail($scheduleId)->delete();
+
+        if ($this->openScheduleId === $scheduleId) {
+            $this->openScheduleId = null;
+        }
     }
 
     public function render()
