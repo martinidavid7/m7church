@@ -78,5 +78,18 @@ return [
     "Cancel" => 'Annulla',
     "People" => "Persone",
     "Service Type" => 'Tipi Servizi',
+    "Visitor" => 'Visitatore',
+    "Notes" => 'Note',
+    "Discipleship" => 'Discepolato',
+    "Discipleships" => 'Discepolati',
+    "Discipler" => 'Discepolatore',
+    "Add New Discipleship" => 'Aggiungi un nuovo Discepolato',
+    "End Discipleship" => 'Termina Discepolato',
+    "Start Date" => 'Data di Inizio',
+    "Notes History" => 'Cronologia Osservazioni',
+    "Add Note" => 'Aggiungi Osservazione',
+    "No notes yet" => 'Nessuna osservazione registrata',
+    "View Details" => 'Vedi Dettagli',
+    "You will be registered as the discipler for this discipleship." => 'Sarai registrato come discepolatore di questo discepolato.',
 
 ];

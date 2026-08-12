@@ -88,5 +88,18 @@ return [
     "Confirm Delete Service Type" => 'Tem certeza que deseja excluir este tipo de reunião?',
     "People Served" => 'Pessoas Atendidas',
     "We Have Served More Than" => 'Já atendemos mais de :count pessoas',
+    "Visitor" => 'Visitante',
+    "Notes" => 'Observações',
+    "Discipleship" => 'Discipulado',
+    "Discipleships" => 'Discipulados',
+    "Discipler" => 'Discipulador',
+    "Add New Discipleship" => 'Adicionar Novo Discipulado',
+    "End Discipleship" => 'Encerrar Discipulado',
+    "Start Date" => 'Data de Início',
+    "Notes History" => 'Histórico de Observações',
+    "Add Note" => 'Adicionar Observação',
+    "No notes yet" => 'Nenhuma observação registrada',
+    "View Details" => 'Ver Detalhes',
+    "You will be registered as the discipler for this discipleship." => 'Você será registrado como o discipulador deste discipulado.',
 
 ];

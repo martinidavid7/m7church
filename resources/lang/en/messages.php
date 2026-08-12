@@ -78,5 +78,18 @@ return [
     "Cancel" => 'Cancel',
     "People" => "People",
     "Service Type" => 'Service Type',
+    "Visitor" => 'Visitor',
+    "Notes" => 'Notes',
+    "Discipleship" => 'Discipleship',
+    "Discipleships" => 'Discipleships',
+    "Discipler" => 'Discipler',
+    "Add New Discipleship" => 'Add New Discipleship',
+    "End Discipleship" => 'End Discipleship',
+    "Start Date" => 'Start Date',
+    "Notes History" => 'Notes History',
+    "Add Note" => 'Add Note',
+    "No notes yet" => 'No notes yet',
+    "View Details" => 'View Details',
+    "You will be registered as the discipler for this discipleship." => 'You will be registered as the discipler for this discipleship.',
 
 ];
