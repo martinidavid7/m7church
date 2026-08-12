@@ -15,6 +15,7 @@ use App\Http\Controllers\ServiceController;
 use App\Http\Controllers\ServiceTypeController;
 use App\Http\Controllers\PublicController;
 use App\Http\Controllers\ScheduleController;
+use App\Http\Controllers\DiscipleshipController;
 
 Route::get('/', [WelcomeController::class, 'index'])->name('home');
 
@@ -110,6 +111,20 @@ Route::middleware(['auth'])->group(function () {
         Route::get('/{schedule}/edit', [ScheduleController::class, 'edit'])->name('edit');
         Route::put('/{schedule}', [ScheduleController::class, 'update'])->name('update');
         Route::delete('/{schedule}', [ScheduleController::class, 'destroy'])->name('destroy');
+    });
+});
+
+// Rotas de Discipulado - módulo fixo, autorização fina no controller (staff globais + líderes do módulo)
+Route::middleware(['auth'])->group(function () {
+    Route::prefix('discipleships')->name('discipleships.')->group(function () {
+        Route::get('/', [DiscipleshipController::class, 'index'])->name('index');
+        Route::get('/create', [DiscipleshipController::class, 'create'])->name('create');
+        Route::post('/', [DiscipleshipController::class, 'store'])->name('store');
+        Route::get('/{discipleship}', [DiscipleshipController::class, 'show'])->name('show');
+        Route::get('/{discipleship}/edit', [DiscipleshipController::class, 'edit'])->name('edit');
+        Route::put('/{discipleship}', [DiscipleshipController::class, 'update'])->name('update');
+        Route::patch('/{discipleship}/end', [DiscipleshipController::class, 'end'])->name('end');
+        Route::post('/{discipleship}/notes', [DiscipleshipController::class, 'storeNote'])->name('notes.store');
     });
 });
 
