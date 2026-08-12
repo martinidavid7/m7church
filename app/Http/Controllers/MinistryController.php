@@ -89,11 +89,23 @@ class MinistryController extends Controller
     {
         $this->authorizeMinistryManage($ministry);
 
-        $validated = $request->validate([
+        $isFixedMinistry = $ministry->name === 'Discipulado';
+
+        $rules = [
             'name' => 'required|string|max:255',
             'description' => 'nullable|string',
             'logo' => 'nullable|image|mimes:jpeg,jpg,png|max:2048',
-        ]);
+        ];
+
+        if ($isFixedMinistry) {
+            unset($rules['name']);
+        }
+
+        $validated = $request->validate($rules);
+
+        if ($isFixedMinistry) {
+            unset($validated['name']);
+        }
 
         try {
             if ($request->hasFile('logo')) {
