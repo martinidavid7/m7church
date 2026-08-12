@@ -185,6 +185,30 @@
                 </div>
             @endrole
 
+            @php
+                $canAccessDiscipulado = (auth()->user()->hasAnyRole(['Admin', 'Pastor Presidente', 'Pastor Auxiliar', 'Secretaria']))
+                    || $myMinistries->contains('name', 'Discipulado');
+            @endphp
+            @if ($canAccessDiscipulado)
+                <div class="relative group">
+                    <a href="{{ route('discipleships.index') }}" :class="sidebarOpen ? 'justify-start' : 'justify-center'"
+                        class="flex items-center gap-2 px-3 py-2.5 rounded-lg transition {{ request()->routeIs('discipleships.*') ? 'bg-indigo-50 text-indigo-600' : 'hover:bg-indigo-50 hover:text-indigo-600' }}"
+                        wire:navigate>
+                        <svg class="w-4 h-4 flex-shrink-0" fill="none" stroke="currentColor" stroke-width="1.5"
+                            viewBox="0 0 24 24">
+                            <path stroke-linecap="round" stroke-linejoin="round"
+                                d="M17.982 18.725A7.488 7.488 0 0012 15.75a7.488 7.488 0 00-5.982 2.975m11.964 0a9 9 0 10-11.964 0m11.964 0A8.966 8.966 0 0112 21a8.966 8.966 0 01-5.982-2.275M15 9.75a3 3 0 11-6 0 3 3 0 016 0z" />
+                        </svg>
+                        <span x-show="sidebarOpen" x-transition
+                            class="whitespace-nowrap">{{ __('messages.Discipleship') }}</span>
+                    </a>
+                    <div x-show="!sidebarOpen"
+                        class="absolute left-full ml-2 px-2 py-1 bg-slate-900 text-white text-xs rounded hidden group-hover:block whitespace-nowrap z-50 top-1/2 -translate-y-1/2">
+                        {{ __('messages.Discipleship') }}
+                    </div>
+                </div>
+            @endif
+
             @role('Admin')
                 <p x-show="sidebarOpen" x-transition
                     class="text-[11px] uppercase tracking-wide text-slate-400 px-2 mt-6 mb-2">

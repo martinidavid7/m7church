@@ -15,13 +15,19 @@
                 <div class="sm:col-span-4">
                     <label for="name"
                         class="block text-sm font-medium text-gray-700 dark:text-gray-300">Nome do Ministério *</label>
-                    <input type="text" name="name" id="name" autocomplete="name"
-                        value="{{ old('name', $ministry->name) }}"
-                        class="mt-1 block w-full rounded-md border-gray-300 shadow-sm focus:border-indigo-500 focus:ring-indigo-500 dark:bg-gray-700 dark:border-gray-600 dark:text-white sm:text-sm py-2"
-                        required>
-                    @error('name')
-                        <span class="text-red-500 text-sm">{{ $message }}</span>
-                    @enderror
+                    @if ($ministry->name === 'Discipulado')
+                        <input type="text" id="name" value="{{ $ministry->name }}" readonly disabled
+                            class="mt-1 block w-full rounded-md border-gray-300 bg-gray-100 shadow-sm dark:bg-gray-800 dark:border-gray-600 dark:text-gray-400 sm:text-sm py-2 cursor-not-allowed">
+                        <p class="mt-1 text-sm text-gray-500 dark:text-gray-400">Este é um módulo fixo do sistema e não pode ser renomeado.</p>
+                    @else
+                        <input type="text" name="name" id="name" autocomplete="name"
+                            value="{{ old('name', $ministry->name) }}"
+                            class="mt-1 block w-full rounded-md border-gray-300 shadow-sm focus:border-indigo-500 focus:ring-indigo-500 dark:bg-gray-700 dark:border-gray-600 dark:text-white sm:text-sm py-2"
+                            required>
+                        @error('name')
+                            <span class="text-red-500 text-sm">{{ $message }}</span>
+                        @enderror
+                    @endif
                 </div>
             </div>
 
