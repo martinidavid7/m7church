@@ -106,4 +106,9 @@ class Person extends Model
             ->withPivot('function')
             ->withTimestamps();
     }
+
+    public function discipling()
+    {
+        return $this->hasMany(Discipleship::class, 'discipulador_id')->active();
+    }
 }
