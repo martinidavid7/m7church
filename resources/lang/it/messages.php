@@ -89,6 +89,8 @@ return [
     "Notes History" => 'Cronologia Osservazioni',
     "Add Note" => 'Aggiungi Osservazione',
     "No notes yet" => 'Nessuna osservazione registrata',
+    "Confirm Delete Note" => 'Sei sicuro di voler eliminare questa osservazione?',
+    "Edit Note" => 'Modifica Osservazione',
     "View Details" => 'Vedi Dettagli',
     "You will be registered as the discipler for this discipleship." => 'Sarai registrato come discepolatore di questo discepolato.',
 

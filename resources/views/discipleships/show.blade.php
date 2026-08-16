@@ -14,7 +14,7 @@
             </div>
         @endif
 
-        <div class="max-w-3xl space-y-6">
+        <div class="space-y-6">
             <div class="bg-white dark:bg-gray-800 shadow-md rounded-lg p-6">
                 <div class="flex items-center justify-between mb-4">
                     <h2 class="text-lg font-semibold text-gray-900 dark:text-white">{{ __('messages.Discipleship') }}</h2>
@@ -102,11 +102,59 @@
 
                 <div class="space-y-4">
                     @forelse ($discipleship->notesHistory as $note)
-                        <div class="border-l-2 border-indigo-200 dark:border-indigo-800 pl-4">
-                            <p class="text-sm text-gray-900 dark:text-white whitespace-pre-line">{{ $note->body }}</p>
-                            <p class="mt-1 text-xs text-gray-500 dark:text-gray-400">
-                                {{ $note->author?->name ?? '-' }} · {{ $note->created_at->format('d/m/Y H:i') }}
-                            </p>
+                        @php
+                            $canEditNote = $isMinistryAdmin || ($currentPersonId && $note->author_id === $currentPersonId);
+                        @endphp
+                        <div class="border-l-2 border-indigo-200 dark:border-indigo-800 pl-4" x-data="{ editing: false }">
+                            <div x-show="!editing">
+                                <p class="text-sm text-gray-900 dark:text-white whitespace-pre-line">{{ $note->body }}</p>
+                                <div class="mt-1 flex items-center justify-between">
+                                    <p class="text-xs text-gray-500 dark:text-gray-400">
+                                        {{ $note->author?->name ?? '-' }} · {{ $note->created_at->format('d/m/Y H:i') }}
+                                        @if ($note->created_at->ne($note->updated_at))
+                                            · {{ __('messages.Edit') }}
+                                        @endif
+                                    </p>
+                                    @if ($canEditNote)
+                                        <div class="flex items-center gap-2">
+                                            <button type="button" @click="editing = true"
+                                                class="text-xs font-medium text-indigo-600 dark:text-indigo-400 hover:underline">
+                                                {{ __('messages.Edit') }}
+                                            </button>
+                                            <form action="{{ route('discipleships.notes.destroy', [$discipleship, $note]) }}" method="POST"
+                                                onsubmit="return confirm('{{ __('messages.Confirm Delete Note') }}');">
+                                                @csrf
+                                                @method('DELETE')
+                                                <button type="submit"
+                                                    class="text-xs font-medium text-red-600 dark:text-red-400 hover:underline">
+                                                    {{ __('messages.Delete') }}
+                                                </button>
+                                            </form>
+                                        </div>
+                                    @endif
+                                </div>
+                            </div>
+
+                            @if ($canEditNote)
+                                <form x-show="editing" x-cloak
+                                    action="{{ route('discipleships.notes.update', [$discipleship, $note]) }}" method="POST"
+                                    class="space-y-2">
+                                    @csrf
+                                    @method('PUT')
+                                    <textarea name="body" rows="3" required
+                                        class="block w-full rounded-md border-gray-300 shadow-sm focus:border-indigo-500 focus:ring-indigo-500 dark:bg-gray-700 dark:border-gray-600 dark:text-white sm:text-sm py-2">{{ $note->body }}</textarea>
+                                    <div class="flex items-center gap-2">
+                                        <button type="submit"
+                                            class="inline-flex justify-center rounded-md border border-transparent bg-indigo-600 py-1.5 px-3 text-xs font-medium text-white shadow-sm hover:bg-indigo-700 focus:outline-none focus:ring-2 focus:ring-indigo-500 focus:ring-offset-2">
+                                            {{ __('messages.Save') }}
+                                        </button>
+                                        <button type="button" @click="editing = false"
+                                            class="inline-flex justify-center rounded-md border border-gray-300 dark:border-gray-600 bg-white dark:bg-gray-700 py-1.5 px-3 text-xs font-medium text-gray-700 dark:text-gray-300 shadow-sm hover:bg-gray-50 dark:hover:bg-gray-600 focus:outline-none focus:ring-2 focus:ring-indigo-500 focus:ring-offset-2">
+                                            {{ __('messages.Cancel') }}
+                                        </button>
+                                    </div>
+                                </form>
+                            @endif
                         </div>
                     @empty
                         <p class="text-sm text-gray-500 dark:text-gray-400">{{ __('messages.No notes yet') }}</p>

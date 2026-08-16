@@ -1,5 +1,5 @@
 <x-layouts.app :title="$ministry->name">
-    <div class="p-6 max-w-3xl">
+    <div class="p-6">
 
         <div class="flex items-start justify-between gap-4 mb-6">
             <div class="flex items-center gap-4">
