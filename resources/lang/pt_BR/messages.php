@@ -99,6 +99,8 @@ return [
     "Notes History" => 'Histórico de Observações',
     "Add Note" => 'Adicionar Observação',
     "No notes yet" => 'Nenhuma observação registrada',
+    "Confirm Delete Note" => 'Tem certeza que deseja excluir esta observação?',
+    "Edit Note" => 'Editar Observação',
     "View Details" => 'Ver Detalhes',
     "You will be registered as the discipler for this discipleship." => 'Você será registrado como o discipulador deste discipulado.',
 

@@ -89,6 +89,8 @@ return [
     "Notes History" => 'Notes History',
     "Add Note" => 'Add Note',
     "No notes yet" => 'No notes yet',
+    "Confirm Delete Note" => 'Are you sure you want to delete this note?',
+    "Edit Note" => 'Edit Note',
     "View Details" => 'View Details',
     "You will be registered as the discipler for this discipleship." => 'You will be registered as the discipler for this discipleship.',
 
