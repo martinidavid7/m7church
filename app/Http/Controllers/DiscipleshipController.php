@@ -4,6 +4,7 @@ namespace App\Http\Controllers;
 
 use App\Http\Controllers\Concerns\AuthorizesDiscipulado;
 use App\Models\Discipleship;
+use App\Models\DiscipleshipNote;
 use App\Models\Person;
 use App\Models\Visitor;
 use Exception;
@@ -11,6 +12,7 @@ use Illuminate\Http\RedirectResponse;
 use Illuminate\Http\Request;
 use Illuminate\Validation\Rule;
 use Illuminate\View\View;
+use Symfony\Component\HttpKernel\Exception\AccessDeniedHttpException;
 
 class DiscipleshipController extends Controller
 {
@@ -113,7 +115,10 @@ class DiscipleshipController extends Controller
 
         $discipleship->load(['discipulador', 'discipulado', 'notesHistory.author']);
 
-        return view('discipleships.show', compact('discipleship'));
+        $currentPersonId = $this->currentPerson()?->id;
+        $isMinistryAdmin = $this->isMinistryAdmin();
+
+        return view('discipleships.show', compact('discipleship', 'currentPersonId', 'isMinistryAdmin'));
     }
 
     /**
@@ -169,6 +174,56 @@ class DiscipleshipController extends Controller
 
         return redirect()->route('discipleships.show', $discipleship)
             ->with('success', 'Observação registrada.');
+    }
+
+    /**
+     * Update an existing note in the discipleship's history.
+     */
+    public function updateNote(Request $request, Discipleship $discipleship, DiscipleshipNote $note): RedirectResponse
+    {
+        $this->authorizeDiscipleshipAccess($discipleship);
+        $this->authorizeNoteAccess($note, $discipleship);
+
+        $validated = $request->validate([
+            'body' => ['required', 'string'],
+        ]);
+
+        $note->update($validated);
+
+        return redirect()->route('discipleships.show', $discipleship)
+            ->with('success', 'Observação atualizada.');
+    }
+
+    /**
+     * Soft delete a note from the discipleship's history.
+     */
+    public function destroyNote(Discipleship $discipleship, DiscipleshipNote $note): RedirectResponse
+    {
+        $this->authorizeDiscipleshipAccess($discipleship);
+        $this->authorizeNoteAccess($note, $discipleship);
+
+        $note->delete();
+
+        return redirect()->route('discipleships.show', $discipleship)
+            ->with('success', 'Observação excluída.');
+    }
+
+    /**
+     * Acesso a uma observação específica: administração global ou o próprio autor.
+     */
+    private function authorizeNoteAccess(DiscipleshipNote $note, Discipleship $discipleship): void
+    {
+        if ($note->discipleship_id !== $discipleship->id) {
+            throw new AccessDeniedHttpException('Observação não pertence a este discipulado.');
+        }
+
+        $person = $this->currentPerson();
+
+        if ($this->isMinistryAdmin() || ($person && $note->author_id === $person->id)) {
+            return;
+        }
+
+        throw new AccessDeniedHttpException('Você não tem acesso a esta observação.');
     }
 
     /**
