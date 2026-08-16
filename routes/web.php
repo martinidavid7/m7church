@@ -125,6 +125,8 @@ Route::middleware(['auth'])->group(function () {
         Route::put('/{discipleship}', [DiscipleshipController::class, 'update'])->name('update');
         Route::patch('/{discipleship}/end', [DiscipleshipController::class, 'end'])->name('end');
         Route::post('/{discipleship}/notes', [DiscipleshipController::class, 'storeNote'])->name('notes.store');
+        Route::put('/{discipleship}/notes/{note}', [DiscipleshipController::class, 'updateNote'])->name('notes.update');
+        Route::delete('/{discipleship}/notes/{note}', [DiscipleshipController::class, 'destroyNote'])->name('notes.destroy');
     });
 });
 
