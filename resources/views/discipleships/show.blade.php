@@ -14,7 +14,7 @@
             </div>
         @endif
 
-        <div class="max-w-3xl space-y-6">
+        <div class="space-y-6">
             <div class="bg-white dark:bg-gray-800 shadow-md rounded-lg p-6">
                 <div class="flex items-center justify-between mb-4">
                     <h2 class="text-lg font-semibold text-gray-900 dark:text-white">{{ __('messages.Discipleship') }}</h2>
